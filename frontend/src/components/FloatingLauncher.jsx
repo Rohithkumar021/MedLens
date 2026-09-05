@@ -1,7 +1,7 @@
 import React from 'react';
 import { Activity, ArrowRight } from 'lucide-react';
 
-export default function FloatingLauncher({ isOpen, onToggle }) {
+export default function FloatingLauncher({ isOpen, onToggle, activePatientName = 'Active Session' }) {
   if (isOpen) return null;
 
   return (
@@ -42,3 +42,4 @@ export default function FloatingLauncher({ isOpen, onToggle }) {
     </button>
   );
 }
+

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DisclaimerBanner from './components/DisclaimerBanner';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+import PatientHeader from './components/PatientHeader';
 import ReviewModal from './components/ReviewModal';
 import PatientFormModal from './components/PatientFormModal';
 import UploadReportModal from './components/UploadReportModal';
@@ -286,6 +287,23 @@ export default function App() {
             {errorBanner && (
               <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold shadow-2xs">
                 {errorBanner}
+              </div>
+            )}
+
+            {/* Persistent Patient Identity & Grouped Context (Rendered once across patient views) */}
+            {currentPatient && ['dashboard', 'reports', 'timeline', 'conflicts', 'review'].includes(currentTab) && (
+              <div className="mb-6">
+                <PatientHeader
+                  patient={currentPatient}
+                  reports={reports}
+                  observations={observations}
+                  conflicts={conflicts}
+                  unreviewedCount={unreviewedCount}
+                  currentTab={currentTab}
+                  setTab={setCurrentTab}
+                  onOpenPatientEdit={() => setIsPatientFormOpen(true)}
+                  onOpenUpload={() => setIsUploadOpen(true)}
+                />
               </div>
             )}
 

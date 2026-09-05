@@ -3,6 +3,7 @@ import { Settings, Shield, Server, Cpu, CheckCircle2, AlertCircle } from 'lucide
 import { api } from '../services/api';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
+import { Badge } from '../components/ui/badge';
 
 export default function SettingsPage() {
   const [health, setHealth] = useState(null);

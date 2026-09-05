@@ -1,6 +1,8 @@
 import React from 'react';
 import { Activity, ArrowRight, ShieldCheck, FileText, CheckCircle2, Sparkles, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Card } from './ui/card';
 
 export default function HostLandingHero({ onOpenApp, currentPatient, patientsCount = 0, reportsCount = 0 }) {
   return (

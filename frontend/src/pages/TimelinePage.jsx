@@ -32,7 +32,7 @@ export default function TimelinePage({ timeline = [], patient }) {
         <div>
           <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-sky-600" />
-            Patient Clinical Timeline: {patient.name}
+            Patient Clinical Timeline
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
             Chronological audit feed of user intake inputs, report uploads, human clinical reviews, and AI summaries

@@ -10,6 +10,8 @@ import ProvenanceBadge from '../components/ProvenanceBadge';
 import ConfidenceBadge from '../components/ConfidenceBadge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
 import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 
 export default function ReviewQueuePage({
   observations,

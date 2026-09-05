@@ -9,6 +9,8 @@ import {
   HelpCircle,
   Activity,
   Link2,
+  CheckCircle2,
+  Check,
   Edit3,
   Users,
   Clock,
@@ -74,92 +76,13 @@ export default function DashboardPage({
 
   return (
     <div className="space-y-6 pb-12">
-      {/* Product Mission Hero Banner with Aceternity Spotlight glow */}
-      <SpotlightCard className="p-6 bg-white border-slate-200">
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-2.5">
-            <div className="flex items-center gap-2">
-              <Badge variant="clinical" className="text-[10px] font-bold tracking-widest uppercase">
-                Clinical Intelligence Overview
-              </Badge>
-              <span className="text-slate-300">·</span>
-              <ProvenanceBadge provenance={patient.source || 'USER_PROVIDED'} size="sm" />
-            </div>
-
-            <div className="flex flex-wrap items-baseline gap-3">
-              <h2 className="text-2xl font-extrabold tracking-tight text-slate-900">{patient.name}</h2>
-              <Badge variant="outline" className="text-xs font-semibold text-slate-700 bg-slate-50">
-                {patient.sex || 'Unspecified'}, {patient.age ? `${patient.age} yrs` : 'Age N/A'}
-              </Badge>
-              {patient.date_of_birth && (
-                <span className="text-xs text-slate-500 font-mono">DOB: {patient.date_of_birth}</span>
-              )}
-            </div>
-
-            {/* Patient Context Tags */}
-            <div className="flex flex-wrap gap-1.5 pt-1 text-xs">
-              {patient.symptoms?.map((s, i) => (
-                <Badge key={i} variant="warning" className="font-medium">
-                  Symptom: {s}
-                </Badge>
-              ))}
-              {patient.existing_conditions?.map((c, i) => (
-                <Badge key={i} variant="clinical" className="font-medium">
-                  Condition: {c}
-                </Badge>
-              ))}
-              {patient.allergies?.map((a, i) => (
-                <Badge key={i} variant="destructive" className="font-bold">
-                  Allergy: {a}
-                </Badge>
-              ))}
-              {patient.medications?.map((m, i) => (
-                <span key={i} className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-purple-50 text-purple-800 border border-purple-200">
-                  Medication: {m}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 shrink-0">
-            {/* Real Data Completeness Index Bar */}
-            <div className="bg-slate-50 border border-slate-200 p-3 rounded-xl text-xs space-y-1.5 w-48 shadow-2xs">
-              <div className="flex items-center justify-between font-semibold text-[11px] text-slate-600">
-                <span>Record Completeness</span>
-                <span className="text-sky-700 font-mono font-bold">{completenessScore}%</span>
-              </div>
-              <Progress value={completenessScore} className="h-2" />
-            </div>
-
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onOpenPatientEdit}
-                className="text-xs font-semibold"
-              >
-                <Edit3 className="w-3.5 h-3.5 mr-1" /> Edit Context
-              </Button>
-              <Button
-                variant="clinical"
-                size="sm"
-                onClick={onOpenUpload}
-                className="text-xs font-semibold shadow-xs"
-              >
-                <Upload className="w-3.5 h-3.5 mr-1" /> Upload Report
-              </Button>
-            </div>
-          </div>
-        </div>
-      </SpotlightCard>
-
-      {/* Primary Overview Cards (4 canonical columns) */}
+      {/* Primary Overview Cards (4 canonical clinical metrics) */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
-        <Card className="p-4 cursor-pointer hover:border-sky-300 transition" onClick={() => setTab('patients')}>
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Patient Context</div>
-          <div className="text-2xl font-extrabold text-slate-900 mt-0.5 font-mono">1 Active</div>
+        <Card className="p-4 cursor-pointer hover:border-sky-300 transition" onClick={() => setTab('review')}>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Extracted Biomarkers</div>
+          <div className="text-2xl font-extrabold text-slate-900 mt-0.5 font-mono">{observations.length} Total</div>
           <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-            <Users className="w-3.5 h-3.5 text-sky-600" /> {patient.name}
+            <Activity className="w-3.5 h-3.5 text-sky-600" /> {normalCount} in standard range
           </div>
         </Card>
 
