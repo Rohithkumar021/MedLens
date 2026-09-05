@@ -6,6 +6,7 @@ import ReviewModal from './components/ReviewModal';
 import PatientFormModal from './components/PatientFormModal';
 import UploadReportModal from './components/UploadReportModal';
 import EvidenceChainModal from './components/EvidenceChainModal';
+import { CommandDialog } from './components/ui/command';
 
 import DashboardPage from './pages/DashboardPage';
 import PatientsPage from './pages/PatientsPage';
@@ -34,6 +35,7 @@ export default function App() {
   const [isPatientFormOpen, setIsPatientFormOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
 
   // Signature Evidence Chain Modal State
   const [isEvidenceChainOpen, setIsEvidenceChainOpen] = useState(false);
@@ -47,6 +49,18 @@ export default function App() {
   // Initial load
   useEffect(() => {
     loadPatients();
+  }, []);
+
+  // Global keyboard shortcut for Command Palette (Ctrl+K or Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsCommandOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   // When active patient changes, fetch all associated clinical records
@@ -192,7 +206,7 @@ export default function App() {
   const unreviewedCount = observations.filter((o) => !o.is_reviewed).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-brand-100 selection:text-brand-900 font-sans">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-sky-100 selection:text-sky-900 font-sans">
       {/* 1. Persistent Responsible AI Disclaimer Banner */}
       <DisclaimerBanner />
 
@@ -206,6 +220,7 @@ export default function App() {
           setIsPatientFormOpen(true);
         }}
         onSeedDemo={handleSeedDemo}
+        onOpenCommand={() => setIsCommandOpen(true)}
         isLoading={isLoading}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -226,7 +241,7 @@ export default function App() {
         {/* Right Main Page View */}
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
           {errorBanner && (
-            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold shadow-subtle">
+            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold shadow-2xs">
               {errorBanner}
             </div>
           )}
@@ -304,6 +319,15 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* Global Command Search Dialog (Ctrl+K) */}
+      <CommandDialog
+        isOpen={isCommandOpen}
+        onClose={() => setIsCommandOpen(false)}
+        patients={patients}
+        onSelectPatient={(p) => setCurrentPatientId(p.id)}
+        onNavigate={(tab) => setCurrentTab(tab)}
+      />
 
       {/* Modals */}
       {isReviewOpen && selectedObservation && (

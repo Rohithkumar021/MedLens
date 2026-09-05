@@ -1,7 +1,10 @@
 import React, { useState } from 'react';
-import { Clock, Calendar, FileText, UserCheck, Sparkles, AlertTriangle, CheckCircle, Filter, Layers, Activity } from 'lucide-react';
+import { Clock, Calendar, FileText, UserCheck, Sparkles, CheckCircle, Filter, Layers } from 'lucide-react';
 import ProvenanceBadge from '../components/ProvenanceBadge';
 import Timeline3D from '../components/3d/Timeline3D';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Badge } from '../components/ui/badge';
 
 export default function TimelinePage({ timeline = [], patient }) {
   const [filterType, setFilterType] = useState('ALL');
@@ -27,8 +30,8 @@ export default function TimelinePage({ timeline = [], patient }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-            <Clock className="w-5 h-5 text-brand-600" />
+          <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <Clock className="w-5 h-5 text-sky-600" />
             Patient Clinical Timeline: {patient.name}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
@@ -38,24 +41,21 @@ export default function TimelinePage({ timeline = [], patient }) {
 
         {/* Filter and 3D Toggle */}
         <div className="flex items-center gap-2">
-          <button
-            type="button"
+          <Button
+            variant={is3DMode ? "clinical" : "outline"}
+            size="sm"
             onClick={() => setIs3DMode(!is3DMode)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold border flex items-center gap-1.5 transition ${
-              is3DMode
-                ? 'bg-sky-50 text-brand-700 border-sky-200 shadow-subtle'
-                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'
-            }`}
+            className="text-xs font-semibold"
           >
-            <Layers className="w-3.5 h-3.5 text-brand-600" />
+            <Layers className="w-3.5 h-3.5 mr-1" />
             {is3DMode ? '3D Spatial Track' : '2D Feed'}
-          </button>
+          </Button>
 
           <Filter className="w-3.5 h-3.5 text-slate-400 ml-1" />
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle cursor-pointer"
+            className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-2xs cursor-pointer"
           >
             <option value="ALL">All Event Types</option>
             <option value="PROFILE_CREATED">Patient Intake</option>
@@ -72,7 +72,7 @@ export default function TimelinePage({ timeline = [], patient }) {
       )}
 
       {/* Timeline List */}
-      <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-card">
+      <Card className="p-6 md:p-8">
         {filteredEvents.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs">
             No events match the selected timeline filter.
@@ -84,17 +84,17 @@ export default function TimelinePage({ timeline = [], patient }) {
               return (
                 <div key={ev.id || index} className="relative group">
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[35px] top-1 w-5 h-5 rounded-full bg-white border-2 border-brand-600 flex items-center justify-center text-brand-600 shadow-subtle group-hover:scale-110 transition">
+                  <div className="absolute -left-[35px] top-1 w-5 h-5 rounded-full bg-white border-2 border-sky-600 flex items-center justify-center text-sky-600 shadow-2xs group-hover:scale-110 transition">
                     <Icon className="w-3 h-3" />
                   </div>
 
                   <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-200 transition space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <span className="font-extrabold text-slate-900 text-xs sm:text-sm">{ev.title}</span>
-                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-slate-200 text-slate-700 rounded">
+                        <span className="font-bold text-slate-900 text-xs sm:text-sm">{ev.title}</span>
+                        <Badge variant="outline" className="text-[10px] font-mono font-bold">
                           {ev.event_type}
-                        </span>
+                        </Badge>
                       </div>
                       <ProvenanceBadge provenance={ev.provenance} size="sm" />
                     </div>
@@ -113,7 +113,7 @@ export default function TimelinePage({ timeline = [], patient }) {
             })}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

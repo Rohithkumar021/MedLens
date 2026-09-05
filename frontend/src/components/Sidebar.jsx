@@ -1,5 +1,7 @@
 import React from 'react';
 import { LayoutDashboard, Users, FileText, Clock, AlertTriangle, CheckSquare, Settings, ShieldCheck } from 'lucide-react';
+import { Badge } from './ui/badge';
+import { Separator } from './ui/separator';
 
 export default function Sidebar({
   currentTab,
@@ -9,14 +11,46 @@ export default function Sidebar({
   isMobileOpen = false,
   onCloseMobile = () => {}
 }) {
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'patients', label: 'Patients Workspace', icon: Users },
-    { id: 'reports', label: 'Medical Reports (Side-by-Side)', icon: FileText },
-    { id: 'timeline', label: 'Patient Timeline', icon: Clock },
-    { id: 'conflicts', label: 'Clinical Inconsistencies', icon: AlertTriangle, badge: conflictsCount, badgeColor: 'bg-rose-100 text-rose-700 border border-rose-200' },
-    { id: 'review', label: 'Human Review & Audit', icon: CheckSquare, badge: unreviewedCount, badgeColor: 'bg-amber-100 text-amber-800 border border-amber-200' },
-    { id: 'settings', label: 'System & Principles', icon: Settings },
+  const navSections = [
+    {
+      title: 'OVERVIEW',
+      items: [
+        { id: 'dashboard', label: 'Clinical Dashboard', icon: LayoutDashboard },
+        { id: 'patients', label: 'Patients Workspace', icon: Users },
+      ],
+    },
+    {
+      title: 'CLINICAL INTELLIGENCE',
+      items: [
+        { id: 'reports', label: 'Source Reports & Facts', icon: FileText },
+        { id: 'timeline', label: 'Temporal Timeline', icon: Clock },
+      ],
+    },
+    {
+      title: 'AUDIT & GOVERNANCE',
+      items: [
+        {
+          id: 'conflicts',
+          label: 'Safety Inconsistencies',
+          icon: AlertTriangle,
+          badge: conflictsCount,
+          badgeVariant: 'destructive',
+        },
+        {
+          id: 'review',
+          label: 'Human Review Queue',
+          icon: CheckSquare,
+          badge: unreviewedCount,
+          badgeVariant: 'warning',
+        },
+      ],
+    },
+    {
+      title: 'SYSTEM',
+      items: [
+        { id: 'settings', label: 'Diagnostics & Principles', icon: Settings },
+      ],
+    },
   ];
 
   const handleNavClick = (id) => {
@@ -26,41 +60,56 @@ export default function Sidebar({
 
   const content = (
     <div className="flex flex-col justify-between h-full p-4">
-      <div className="space-y-1">
-        <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
-          Clinical Intelligence Navigation
-        </div>
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
-          return (
-            <button
-              key={item.id}
-              onClick={() => handleNavClick(item.id)}
-              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
-                isActive
-                  ? 'bg-sky-50 text-brand-700 font-bold border border-sky-200/90 shadow-subtle'
-                  : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900 border border-transparent'
-              }`}
-            >
-              <div className="flex items-center gap-2.5">
-                <Icon className={`w-4 h-4 ${isActive ? 'text-brand-600' : 'text-slate-400'}`} aria-hidden="true" />
-                <span>{item.label}</span>
-              </div>
-              {item.badge > 0 && (
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${item.badgeColor}`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
+      <div className="space-y-4">
+        {navSections.map((section, idx) => (
+          <div key={section.title} className="space-y-1">
+            <div className="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
+              {section.title}
+            </div>
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => handleNavClick(item.id)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium transition-all ${
+                      isActive
+                        ? 'bg-sky-50 text-sky-900 font-semibold border border-sky-200/90 shadow-2xs'
+                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <Icon
+                        className={`w-4 h-4 ${
+                          isActive ? 'text-sky-600' : 'text-slate-400'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span>{item.label}</span>
+                    </div>
+                    {item.badge > 0 && (
+                      <Badge
+                        variant={item.badgeVariant || 'default'}
+                        className="text-[10px] px-1.5 py-0 h-4 min-w-4 flex items-center justify-center font-bold"
+                      >
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+            {idx < navSections.length - 1 && <Separator className="my-2" />}
+          </div>
+        ))}
       </div>
 
       {/* Safety & Compliance Box */}
-      <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] space-y-1.5 text-slate-600 select-none">
+      <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl text-[11px] space-y-1.5 text-slate-600 select-none mt-4 shadow-2xs">
         <div className="font-bold text-slate-800 flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" aria-hidden="true" />
           <span>Deterministic Guardrails</span>
         </div>
         <p className="text-slate-500 text-[10.5px] leading-relaxed">
@@ -85,7 +134,7 @@ export default function Sidebar({
             onClick={onCloseMobile}
             aria-hidden="true"
           />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-slate-200 shadow-xl z-10 animate-modal-in">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white border-r border-slate-200 shadow-xl z-10 animate-in slide-in-from-left duration-200">
             {content}
           </div>
         </div>

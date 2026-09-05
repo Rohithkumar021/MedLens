@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { X, CheckCircle, Edit3, XCircle, AlertCircle, History, FileText } from 'lucide-react';
 import StatusBadge from './StatusBadge';
 import ProvenanceBadge from './ProvenanceBadge';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 
 export default function ReviewModal({ observation, onClose, onReviewed }) {
   const [action, setAction] = useState('CONFIRM');
@@ -37,12 +40,12 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 overflow-y-auto">
-      <div className="bg-white rounded-2xl shadow-modal border border-slate-200 w-full max-w-xl overflow-hidden animate-modal-in">
+      <div className="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
         {/* Header */}
         <div className="bg-slate-50 border-b border-slate-200 px-6 py-4 flex items-center justify-between">
           <div>
-            <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
-              <Edit3 className="w-4 h-4 text-brand-600" aria-hidden="true" />
+            <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
+              <Edit3 className="w-4 h-4 text-sky-600" aria-hidden="true" />
               Human Clinical Verification &amp; Review
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -60,27 +63,27 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {error && (
-            <div className="bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-lg text-xs font-semibold flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
-              <span>{error}</span>
-            </div>
+            <Alert variant="destructive">
+              <AlertCircle className="w-4 h-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
           )}
 
           {/* Original Extraction Card */}
           <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500">Source Observation</span>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 font-mono">Source Observation</span>
               <ProvenanceBadge provenance={observation.provenance} />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Test Name</label>
-                <div className="font-extrabold text-slate-900 text-base">{observation.test_name}</div>
+                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider font-mono">Test Name</label>
+                <div className="font-bold text-slate-900 text-base">{observation.test_name}</div>
               </div>
               <div>
-                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Reported Value</label>
-                <div className="font-mono font-extrabold text-brand-700 text-base">
+                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider font-mono">Reported Value</label>
+                <div className="font-mono font-bold text-sky-700 text-base">
                   {observation.value_text} {observation.unit || ''}
                 </div>
               </div>
@@ -88,13 +91,13 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
 
             <div className="grid grid-cols-2 gap-4 pt-2 border-t border-slate-200">
               <div>
-                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">Source Reference Range</label>
+                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider font-mono">Source Reference Range</label>
                 <div className="text-xs font-mono text-slate-700 font-semibold">
                   {observation.original_reference_range || 'Reference range not provided in source report'}
                 </div>
               </div>
               <div>
-                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider">System-Derived Status</label>
+                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider font-mono">System-Derived Status</label>
                 <div>
                   <StatusBadge status={observation.status} size="sm" />
                 </div>
@@ -103,7 +106,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
 
             {observation.original_text && (
               <div className="pt-2 border-t border-slate-200">
-                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                <label className="text-[10.5px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1 font-mono">
                   <FileText className="w-3 h-3 text-slate-400" />
                   Exact Source Line (Page {observation.source_page || 1})
                 </label>
@@ -125,7 +128,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                 onClick={() => setAction('CONFIRM')}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
                   action === 'CONFIRM'
-                    ? 'bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-500/20 shadow-subtle'
+                    ? 'bg-emerald-50 border-emerald-500 text-emerald-900 ring-2 ring-emerald-500/20 shadow-2xs'
                     : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -138,11 +141,11 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                 onClick={() => setAction('EDIT')}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
                   action === 'EDIT'
-                    ? 'bg-sky-50 border-brand-600 text-brand-900 ring-2 ring-brand-600/20 shadow-subtle'
+                    ? 'bg-sky-50 border-sky-600 text-sky-900 ring-2 ring-sky-600/20 shadow-2xs'
                     : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                <Edit3 className={`w-4 h-4 mb-1 ${action === 'EDIT' ? 'text-brand-600' : 'text-slate-400'}`} />
+                <Edit3 className={`w-4 h-4 mb-1 ${action === 'EDIT' ? 'text-sky-600' : 'text-slate-400'}`} />
                 <span>Edit / Correct</span>
               </button>
 
@@ -151,7 +154,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                 onClick={() => setAction('REJECT')}
                 className={`flex flex-col items-center justify-center p-3 rounded-xl border text-xs font-bold transition ${
                   action === 'REJECT'
-                    ? 'bg-rose-50 border-rose-500 text-rose-900 ring-2 ring-rose-500/20 shadow-subtle'
+                    ? 'bg-rose-50 border-rose-500 text-rose-900 ring-2 ring-rose-500/20 shadow-2xs'
                     : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'
                 }`}
               >
@@ -163,7 +166,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
 
           {/* Edit Fields (if EDIT selected) */}
           {action === 'EDIT' && (
-            <div className="p-4 bg-sky-50 rounded-xl border border-sky-200 space-y-3 animate-modal-in">
+            <div className="p-4 bg-sky-50 rounded-xl border border-sky-200 space-y-3 animate-in fade-in zoom-in-95 duration-150">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
@@ -174,7 +177,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                     value={correctedValue}
                     onChange={(e) => setCorrectedValue(e.target.value)}
                     required
-                    className="w-full px-3 py-1.5 text-xs font-mono font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white text-slate-900"
+                    className="w-full px-3 py-1.5 text-xs font-mono font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white text-slate-900"
                     placeholder="e.g. 13.5"
                   />
                 </div>
@@ -185,7 +188,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                   <select
                     value={correctedStatus}
                     onChange={(e) => setCorrectedStatus(e.target.value)}
-                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none bg-white text-slate-900"
+                    className="w-full px-3 py-1.5 text-xs font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white text-slate-900 cursor-pointer"
                   >
                     <option value="NORMAL">NORMAL</option>
                     <option value="LOW">LOW</option>
@@ -209,7 +212,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 placeholder="Document clinical verification reasoning..."
-                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                className="w-full px-3 py-2 text-xs bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"
               />
             </div>
             <div>
@@ -220,7 +223,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
                 type="text"
                 value={reviewer}
                 onChange={(e) => setReviewer(e.target.value)}
-                className="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-brand-500 focus:outline-none"
+                className="w-full px-3 py-1.5 text-xs bg-white border border-slate-300 text-slate-900 rounded-lg focus:ring-2 focus:ring-sky-500 focus:outline-none"
               />
             </div>
           </div>
@@ -229,7 +232,7 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
           {observation.review_records && observation.review_records.length > 0 && (
             <div className="pt-3 border-t border-slate-200">
               <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500 mb-2 font-mono">
-                <History className="w-3.5 h-3.5 text-brand-600" />
+                <History className="w-3.5 h-3.5 text-sky-600" />
                 <span>Audit Trail ({observation.review_records.length})</span>
               </div>
               <div className="space-y-1.5 max-h-24 overflow-y-auto">
@@ -244,21 +247,25 @@ export default function ReviewModal({ observation, onClose, onReviewed }) {
           )}
 
           {/* Modal Footer */}
-          <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
-            <button
+          <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200">
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 rounded-lg transition"
+              className="text-xs font-medium"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
+              variant="clinical"
+              size="sm"
               disabled={isSubmitting}
-              className="px-5 py-2 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 rounded-lg shadow-sm transition disabled:opacity-50"
+              className="text-xs font-bold shadow-xs"
             >
               {isSubmitting ? 'Saving Review...' : 'Save & Record Audit'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>
