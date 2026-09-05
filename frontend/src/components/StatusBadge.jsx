@@ -8,36 +8,46 @@ export default function StatusBadge({ status, size = 'md', showReasonTooltip = f
     NORMAL: {
       label: 'NORMAL',
       bgClass: 'bg-emerald-50 text-emerald-800 border-emerald-200/80',
+      bgClass: 'bg-emerald-950/80 text-emerald-300 border-emerald-500/40 shadow-glow-emerald',
       icon: CheckCircle2,
       iconClass: 'text-emerald-600',
+      iconClass: 'text-emerald-400',
       title: 'Within report reference interval'
     },
     LOW: {
       label: 'LOW',
       bgClass: 'bg-amber-50 text-amber-900 border-amber-300',
+      bgClass: 'bg-cyan-950/80 text-cyan-300 border-cyan-500/40 shadow-glow-cyan',
       icon: ArrowDownRight,
       iconClass: 'text-amber-700',
+      iconClass: 'text-cyan-400',
       title: 'Below report reference interval'
     },
     HIGH: {
       label: 'HIGH',
       bgClass: 'bg-rose-50 text-rose-900 border-rose-300',
+      bgClass: 'bg-amber-950/80 text-amber-300 border-amber-500/40 shadow-glow-amber',
       icon: ArrowUpRight,
       iconClass: 'text-rose-700',
+      iconClass: 'text-amber-400',
       title: 'Above report reference interval'
     },
     NOT_AVAILABLE: {
       label: 'NOT AVAILABLE',
       bgClass: 'bg-slate-100 text-slate-700 border-slate-300',
+      bgClass: 'bg-slate-900/90 text-slate-300 border-slate-700/80',
       icon: HelpCircle,
       iconClass: 'text-slate-500',
+      iconClass: 'text-slate-400',
       title: 'Reference range not provided in source report'
     },
     UNKNOWN: {
       label: 'UNKNOWN',
       bgClass: 'bg-slate-100 text-slate-700 border-slate-300',
+      bgClass: 'bg-slate-900/90 text-slate-300 border-slate-700/80',
       icon: HelpCircle,
       iconClass: 'text-slate-500',
+      iconClass: 'text-slate-400',
       title: 'Complex or unparsed reference range'
     }
   };
@@ -47,6 +57,7 @@ export default function StatusBadge({ status, size = 'md', showReasonTooltip = f
 
   const sizeClasses = {
     sm: 'text-[11px] px-2 py-0.5 gap-1 font-semibold tracking-wide',
+    sm: 'text-[10.5px] px-2 py-0.5 gap-1 font-bold tracking-wide',
     md: 'text-xs px-2.5 py-1 gap-1.5 font-bold tracking-wide',
     lg: 'text-xs sm:text-sm px-3 py-1.5 gap-2 font-bold tracking-wider'
   };
@@ -61,9 +72,11 @@ export default function StatusBadge({ status, size = 'md', showReasonTooltip = f
     <span
       title={reason || config.title}
       className={`inline-flex items-center rounded-md border shadow-subtle select-none ${config.bgClass} ${sizeClasses[size]}`}
+      className={`inline-flex items-center rounded-lg border backdrop-blur-xs select-none transition-all ${config.bgClass} ${sizeClasses[size]}`}
     >
       <Icon className={`${iconSizes[size]} ${config.iconClass} shrink-0`} aria-hidden="true" />
       <span>{config.label}</span>
+      <span className="font-mono">{config.label}</span>
     </span>
   );
 }

@@ -16,6 +16,8 @@ export default function Sidebar({
     { id: 'timeline', label: 'Patient Timeline', icon: Clock },
     { id: 'conflicts', label: 'Clinical Inconsistencies', icon: AlertTriangle, badge: conflictsCount, badgeColor: 'bg-rose-600' },
     { id: 'review', label: 'Human Review & Audit', icon: CheckSquare, badge: unreviewedCount, badgeColor: 'bg-amber-600' },
+    { id: 'conflicts', label: 'Clinical Inconsistencies', icon: AlertTriangle, badge: conflictsCount, badgeColor: 'bg-rose-500/20 text-rose-300 border border-rose-500/40' },
+    { id: 'review', label: 'Human Review & Audit', icon: CheckSquare, badge: unreviewedCount, badgeColor: 'bg-amber-500/20 text-amber-300 border border-amber-500/40' },
     { id: 'settings', label: 'System & Principles', icon: Settings },
   ];
 
@@ -29,6 +31,8 @@ export default function Sidebar({
       <div className="space-y-1">
         <div className="px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-slate-400 select-none">
           Clinical Intelligence Navigation
+        <div className="px-3 py-2 text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400 select-none">
+          Clinical Telemetry
         </div>
         {navItems.map((item) => {
           const Icon = item.icon;
@@ -38,17 +42,22 @@ export default function Sidebar({
               key={item.id}
               onClick={() => handleNavClick(item.id)}
               className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-xs font-semibold transition ${
+              className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold transition group ${
                 isActive
                   ? 'bg-sky-50 text-brand-700 font-bold border border-sky-200/90 shadow-subtle'
                   : 'text-slate-600 hover:bg-slate-100/80 hover:text-slate-900'
+                  ? 'bg-sky-500/15 text-sky-300 font-bold border border-sky-400/40 shadow-glow-cyan'
+                  : 'text-slate-400 hover:bg-slate-850 hover:text-slate-200 border border-transparent'
               }`}
             >
               <div className="flex items-center gap-2.5">
                 <Icon className={`w-4 h-4 ${isActive ? 'text-brand-600' : 'text-slate-400'}`} aria-hidden="true" />
+                <Icon className={`w-4 h-4 transition ${isActive ? 'text-sky-400' : 'text-slate-500 group-hover:text-slate-300'}`} aria-hidden="true" />
                 <span>{item.label}</span>
               </div>
               {item.badge > 0 && (
                 <span className={`text-[10px] text-white px-1.5 py-0.5 rounded-full font-bold ${item.badgeColor}`}>
+                <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded-md font-bold ${item.badgeColor}`}>
                   {item.badge}
                 </span>
               )}
@@ -61,9 +70,13 @@ export default function Sidebar({
       <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-[11px] space-y-1.5 text-slate-600 select-none">
         <div className="font-bold text-slate-800 flex items-center gap-1.5">
           <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+      <div className="p-3.5 bg-slate-900/90 border border-slate-800 rounded-2xl text-[11px] space-y-1.5 text-slate-300 select-none shadow-subtle">
+        <div className="font-bold text-white flex items-center gap-1.5">
+          <ShieldCheck className="w-4 h-4 text-emerald-400" aria-hidden="true" />
           <span>Deterministic Guardrails</span>
         </div>
         <p className="text-slate-500 text-[10.5px] leading-relaxed">
+        <p className="text-slate-400 text-[10.5px] leading-relaxed">
           Reference ranges evaluate strictly via source report bounds without AI hallucination.
         </p>
       </div>
@@ -74,6 +87,7 @@ export default function Sidebar({
     <>
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0 min-h-[calc(100vh-6.5rem)]">
+      <aside className="hidden md:flex w-64 bg-slate-950/70 backdrop-blur-md border-r border-slate-800/80 flex-col shrink-0 min-h-[calc(100vh-6.5rem)]">
         {content}
       </aside>
 
@@ -82,10 +96,12 @@ export default function Sidebar({
         <div className="fixed inset-0 z-50 md:hidden flex">
           <div
             className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
             aria-hidden="true"
           />
           <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-xl z-10 animate-modal-in">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-slate-900 border-r border-slate-800 shadow-2xl z-10 animate-modal-in">
             {content}
           </div>
         </div>

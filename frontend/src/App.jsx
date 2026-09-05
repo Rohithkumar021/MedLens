@@ -193,6 +193,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100 bg-grid-telemetry selection:bg-cyan-500/30 selection:text-cyan-200">
       {/* 1. Persistent Responsible AI Disclaimer Banner */}
       <DisclaimerBanner />
 
@@ -227,6 +228,7 @@ export default function App() {
         <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
           {errorBanner && (
             <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold">
+            <div className="mb-5 p-3.5 bg-rose-950/60 border border-rose-800/80 text-rose-300 rounded-xl text-xs font-semibold backdrop-blur-md shadow-glow-rose">
               {errorBanner}
             </div>
           )}

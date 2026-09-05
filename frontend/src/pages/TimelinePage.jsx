@@ -29,9 +29,12 @@ export default function TimelinePage({ timeline = [], patient }) {
         <div>
           <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
             <Clock className="w-5 h-5 text-brand-600" />
+          <h2 className="text-lg font-extrabold text-white flex items-center gap-2">
+            <Clock className="w-5 h-5 text-sky-400" />
             Patient Clinical Timeline: {patient.name}
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-400 mt-0.5">
             Chronological audit feed of user intake inputs, report uploads, human clinical reviews, and AI summaries
           </p>
         </div>
@@ -45,6 +48,8 @@ export default function TimelinePage({ timeline = [], patient }) {
               is3DMode
                 ? 'bg-slate-900 text-sky-400 border-slate-800 shadow-sm'
                 : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100'
+                ? 'bg-sky-500/20 text-sky-300 border-sky-500/40 shadow-glow-cyan'
+                : 'bg-slate-900 text-slate-300 border-slate-700 hover:bg-slate-800'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -56,6 +61,7 @@ export default function TimelinePage({ timeline = [], patient }) {
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
             className="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-brand-500 shadow-subtle"
+            className="bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-semibold text-slate-200 focus:outline-none focus:border-sky-500 shadow-subtle cursor-pointer"
           >
             <option value="ALL">All Event Types</option>
             <option value="PROFILE_CREATED">Patient Intake</option>
@@ -73,26 +79,33 @@ export default function TimelinePage({ timeline = [], patient }) {
 
       {/* Timeline List */}
       <div className="bg-white rounded-2xl border border-slate-200 p-6 md:p-8 shadow-card">
+      <div className="bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-800 p-6 md:p-8 shadow-elevation">
         {filteredEvents.length === 0 ? (
           <div className="p-8 text-center text-slate-400 text-xs">
+          <div className="p-8 text-center text-slate-500 text-xs">
             No events match the selected timeline filter.
           </div>
         ) : (
           <div className="relative border-l-2 border-slate-200 ml-3 pl-6 space-y-6">
+          <div className="relative border-l-2 border-slate-800 ml-3 pl-6 space-y-6">
             {filteredEvents.map((ev, index) => {
               const Icon = eventTypeIcons[ev.event_type] || Clock;
               return (
                 <div key={ev.id || index} className="relative group">
                   {/* Timeline Dot */}
                   <div className="absolute -left-[35px] top-1 w-5 h-5 rounded-full bg-white border-2 border-brand-600 flex items-center justify-center text-brand-600 shadow-xs group-hover:scale-110 transition">
+                  <div className="absolute -left-[35px] top-1 w-5 h-5 rounded-full bg-slate-950 border-2 border-sky-400 flex items-center justify-center text-sky-400 shadow-glow-cyan group-hover:scale-110 transition">
                     <Icon className="w-3 h-3" />
                   </div>
 
                   <div className="bg-slate-50 hover:bg-slate-100/80 p-4 rounded-xl border border-slate-200 transition space-y-2">
+                  <div className="bg-slate-950/70 hover:bg-slate-950/90 p-4 rounded-xl border border-slate-800 hover:border-slate-700 transition space-y-2">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
                         <span className="font-extrabold text-slate-900 text-xs sm:text-sm">{ev.title}</span>
                         <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-slate-200 text-slate-700 rounded">
+                        <span className="font-extrabold text-white text-xs sm:text-sm">{ev.title}</span>
+                        <span className="text-[10px] font-mono font-bold px-2 py-0.5 bg-slate-800 text-slate-300 rounded border border-slate-700">
                           {ev.event_type}
                         </span>
                       </div>
@@ -100,10 +113,13 @@ export default function TimelinePage({ timeline = [], patient }) {
                     </div>
 
                     <p className="text-xs text-slate-700 leading-relaxed">{ev.description}</p>
+                    <p className="text-xs text-slate-300 leading-relaxed">{ev.description}</p>
 
                     <div className="flex items-center justify-between pt-2 border-t border-slate-200/60 text-[10.5px] text-slate-400 font-mono">
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80 text-[10.5px] text-slate-400 font-mono">
                       <span className="flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5" /> Event Date: {ev.event_date || 'Date Not Stated'}
+                        <Calendar className="w-3.5 h-3.5 text-slate-500" /> Event Date: {ev.event_date || 'Date Not Stated'}
                       </span>
                       <span>Recorded: {new Date(ev.created_at).toLocaleString()}</span>
                     </div>
