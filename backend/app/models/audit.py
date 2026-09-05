@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Text, JSON
 from backend.app.database import Base
 
@@ -14,5 +14,5 @@ class AuditEvent(Base):
     details = Column(JSON, default=dict)
     ip_address = Column(String(50), nullable=True)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 

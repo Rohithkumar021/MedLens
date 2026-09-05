@@ -32,7 +32,7 @@ export function CommandDialog({
   if (!isOpen) return null;
 
   const filteredPatients = (patients || []).filter((p) =>
-    `${p.first_name} ${p.last_name} ${p.mrn} ${p.condition || ""}`
+    `${p.name || ''} ${p.mrn || ''} ${(p.existing_conditions || []).join(' ')} ${(p.symptoms || []).join(' ')}`
       .toLowerCase()
       .includes(query.toLowerCase())
   );
@@ -117,37 +117,45 @@ export function CommandDialog({
               <div className="px-2 py-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
                 Patients ({filteredPatients.length})
               </div>
-              {filteredPatients.slice(0, 5).map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    onSelectPatient(p);
-                    onNavigate("dashboard");
-                    onClose();
-                  }}
-                  className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors"
-                >
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-100 text-xs font-bold text-sky-700">
-                      {p.first_name?.[0]}
-                      {p.last_name?.[0]}
+              {filteredPatients.slice(0, 5).map((p) => {
+                const initials = (p.name || 'PT')
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')
+                  .slice(0, 2)
+                  .toUpperCase();
+
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      onSelectPatient(p);
+                      onNavigate("dashboard");
+                      onClose();
+                    }}
+                    className="flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm text-slate-700 hover:bg-sky-50 hover:text-sky-700 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-sky-100 text-[11px] font-bold text-sky-700">
+                        {initials}
+                      </div>
+                      <div>
+                        <span className="font-medium text-slate-900">
+                          {p.name}
+                        </span>
+                        <span className="ml-2 text-xs font-mono text-slate-400">
+                          ID: {p.mrn || p.id?.slice(0, 8)}
+                        </span>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium text-slate-900">
-                        {p.first_name} {p.last_name}
+                    {p.existing_conditions?.[0] && (
+                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                        {p.existing_conditions[0]}
                       </span>
-                      <span className="ml-2 text-xs font-mono text-slate-400">
-                        MRN: {p.mrn}
-                      </span>
-                    </div>
-                  </div>
-                  {p.condition && (
-                    <span className="text-xs text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
-                      {p.condition}
-                    </span>
-                  )}
-                </button>
-              ))}
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
 

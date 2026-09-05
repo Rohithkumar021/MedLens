@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Integer, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from backend.app.database import Base
@@ -30,7 +30,7 @@ class MedicalReport(Base):
     status = Column(String(50), default="PROCESSED", nullable=False) # PROCESSED, FAILED, PENDING
     provenance = Column(String(50), default="REPORT_EXTRACTED", nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     patient = relationship("Patient", back_populates="reports")

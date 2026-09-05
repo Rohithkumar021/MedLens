@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -69,7 +69,7 @@ def review_observation(
 
     obs.is_reviewed = True
     obs.reviewer_notes = review_in.notes
-    obs.reviewed_at = datetime.utcnow()
+    obs.reviewed_at = datetime.now(timezone.utc)
 
     # Record Review Audit Log
     review_record = ReviewRecord(

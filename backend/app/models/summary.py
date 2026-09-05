@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from backend.app.database import Base
@@ -19,7 +19,7 @@ class AISummary(Base):
     provenance = Column(String(50), default="AI_GENERATED", nullable=False)
     model_name = Column(String(100), default="gemini-2.5-flash", nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     patient = relationship("Patient", back_populates="summaries")

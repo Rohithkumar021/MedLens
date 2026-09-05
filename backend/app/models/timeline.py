@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, DateTime, Text, ForeignKey, JSON
 from sqlalchemy.orm import relationship
 from backend.app.database import Base
@@ -20,7 +20,7 @@ class TimelineEvent(Base):
     reference_id = Column(String(100), nullable=True) # ID of linked report, observation, etc.
     event_metadata = Column(JSON, default=dict)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     # Relationships
     patient = relationship("Patient", back_populates="timeline_events")

@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Float, Integer, Boolean, DateTime, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from backend.app.database import Base
@@ -41,7 +41,7 @@ class Observation(Base):
     reviewed_at = Column(DateTime, nullable=True)
     
     observation_date = Column(String(50), nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     patient = relationship("Patient", back_populates="observations")
@@ -63,7 +63,7 @@ class ReviewRecord(Base):
     notes = Column(Text, nullable=True)
     reviewer = Column(String(100), default="Clinician / Reviewer", nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
     
     # Relationships
     observation = relationship("Observation", back_populates="review_records")
