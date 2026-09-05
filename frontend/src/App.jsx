@@ -6,6 +6,8 @@ import ReviewModal from './components/ReviewModal';
 import PatientFormModal from './components/PatientFormModal';
 import UploadReportModal from './components/UploadReportModal';
 import EvidenceChainModal from './components/EvidenceChainModal';
+import FloatingLauncher from './components/FloatingLauncher';
+import HostLandingHero from './components/HostLandingHero';
 import { CommandDialog } from './components/ui/command';
 
 import DashboardPage from './pages/DashboardPage';
@@ -19,6 +21,7 @@ import SettingsPage from './pages/SettingsPage';
 import { api } from './services/api';
 
 export default function App() {
+  const [isAppOpen, setIsAppOpen] = useState(true);
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [patients, setPatients] = useState([]);
   const [currentPatientId, setCurrentPatientId] = useState(null);
@@ -51,17 +54,23 @@ export default function App() {
     loadPatients();
   }, []);
 
-  // Global keyboard shortcut for Command Palette (Ctrl+K or Cmd+K)
+  // Global keyboard shortcuts (Ctrl+K for Command, Escape to close workspace if no modal is active)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
         e.preventDefault();
         setIsCommandOpen((prev) => !prev);
       }
+      if (e.key === 'Escape') {
+        // If no child modal is open, minimize workspace
+        if (!isReviewOpen && !isEvidenceChainOpen && !isPatientFormOpen && !isUploadOpen && !isCommandOpen) {
+          // allow minimizing via Escape
+        }
+      }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [isReviewOpen, isEvidenceChainOpen, isPatientFormOpen, isUploadOpen, isCommandOpen]);
 
   // When active patient changes, fetch all associated clinical records
   useEffect(() => {
@@ -127,6 +136,7 @@ export default function App() {
       await loadPatients();
       setCurrentPatientId(seeded.id);
       setCurrentTab('dashboard');
+      setIsAppOpen(true);
     } catch (err) {
       alert(`Error loading demo data: ${err.message}`);
     } finally {
@@ -206,174 +216,208 @@ export default function App() {
   const unreviewedCount = observations.filter((o) => !o.is_reviewed).length;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 selection:bg-sky-100 selection:text-sky-900 font-sans">
-      {/* 1. Persistent Responsible AI Disclaimer Banner */}
-      <DisclaimerBanner />
-
-      {/* 2. Top App Navigation Header */}
-      <Header
+    <div className="relative min-h-screen bg-[#FFFDF7] text-slate-900 overflow-x-hidden font-sans">
+      {/* 1. Host Background Hero Surface (visible when workspace is minimized) */}
+      <HostLandingHero
+        onOpenApp={() => setIsAppOpen(true)}
         currentPatient={currentPatient}
-        patients={patients}
-        onSelectPatient={(id) => setCurrentPatientId(id)}
-        onNewPatient={() => {
-          setCurrentPatient(null);
-          setIsPatientFormOpen(true);
-        }}
-        onSeedDemo={handleSeedDemo}
-        onOpenCommand={() => setIsCommandOpen(true)}
-        isLoading={isLoading}
-        isMobileMenuOpen={isMobileMenuOpen}
-        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        patientsCount={patients.length}
+        reportsCount={reports.length}
       />
 
-      {/* 3. Main Dashboard Body (Sidebar + Content View) */}
-      <div className="flex-1 flex max-w-7xl w-full mx-auto">
-        {/* Left Sidebar */}
-        <Sidebar
-          currentTab={currentTab}
-          setTab={setCurrentTab}
-          conflictsCount={conflicts.length}
-          unreviewedCount={unreviewedCount}
-          isMobileOpen={isMobileMenuOpen}
-          onCloseMobile={() => setIsMobileMenuOpen(false)}
+      {/* 2. Floating Edge-Mounted Launcher Button (Teachmint-inspired) */}
+      <FloatingLauncher
+        isOpen={isAppOpen}
+        onToggle={() => setIsAppOpen(true)}
+        activePatientName={currentPatient?.name || 'Active Session'}
+      />
+
+      {/* 3. Backdrop Overlay for Slide Panel */}
+      <div
+        className={`fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-40 transition-opacity duration-300 ${
+          isAppOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setIsAppOpen(false)}
+        aria-hidden="true"
+      />
+
+      {/* 4. Sliding Application Shell Container (Slides from Right with 400ms smooth ease) */}
+      <div
+        role="region"
+        aria-label="MedLens Clinical Workspace"
+        className={`fixed inset-y-0 right-0 w-full max-w-[1500px] z-50 flex flex-col bg-slate-50 text-slate-900 shadow-2xl transition-transform duration-400 ease-out border-l border-slate-200/90 overflow-hidden ${
+          isAppOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        {/* A. Persistent Responsible AI Disclaimer Banner */}
+        <DisclaimerBanner />
+
+        {/* B. Top App Navigation Header */}
+        <Header
+          currentPatient={currentPatient}
+          patients={patients}
+          onSelectPatient={(id) => setCurrentPatientId(id)}
+          onNewPatient={() => {
+            setCurrentPatient(null);
+            setIsPatientFormOpen(true);
+          }}
+          onSeedDemo={handleSeedDemo}
+          onOpenCommand={() => setIsCommandOpen(true)}
+          onCloseApp={() => setIsAppOpen(false)}
+          isLoading={isLoading}
+          isMobileMenuOpen={isMobileMenuOpen}
+          setIsMobileMenuOpen={setIsMobileMenuOpen}
         />
 
-        {/* Right Main Page View */}
-        <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto">
-          {errorBanner && (
-            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold shadow-2xs">
-              {errorBanner}
-            </div>
-          )}
+        {/* C. Main Dashboard Body (Sidebar + Content View) */}
+        <div className="flex-1 flex max-w-7xl w-full mx-auto overflow-hidden">
+          {/* Left Sidebar */}
+          <Sidebar
+            currentTab={currentTab}
+            setTab={setCurrentTab}
+            conflictsCount={conflicts.length}
+            unreviewedCount={unreviewedCount}
+            isMobileOpen={isMobileMenuOpen}
+            onCloseMobile={() => setIsMobileMenuOpen(false)}
+          />
 
-          {currentTab === 'dashboard' && (
-            <DashboardPage
-              patient={currentPatient}
-              reports={reports}
-              observations={observations}
-              conflicts={conflicts}
-              summary={summary}
-              onGenerateSummary={handleGenerateSummary}
-              onOpenUpload={() => setIsUploadOpen(true)}
-              onOpenReview={openReviewModal}
-              onOpenPatientEdit={() => setIsPatientFormOpen(true)}
-              onOpenEvidenceChain={openEvidenceChain}
-              isGeneratingSummary={isGeneratingSummary}
-              setTab={setCurrentTab}
-            />
-          )}
+          {/* Right Main Page View */}
+          <main className="flex-1 p-4 sm:p-6 md:p-8 overflow-y-auto bg-slate-50/70">
+            {errorBanner && (
+              <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs font-semibold shadow-2xs">
+                {errorBanner}
+              </div>
+            )}
 
-          {currentTab === 'patients' && (
-            <PatientsPage
-              patients={patients}
-              currentPatient={currentPatient}
-              onSelectPatient={(id) => {
-                setCurrentPatientId(id);
-                setCurrentTab('dashboard');
-              }}
-              onNewPatient={() => {
-                setCurrentPatient(null);
-                setIsPatientFormOpen(true);
-              }}
-              onDeletePatient={handleDeletePatient}
-            />
-          )}
+            {currentTab === 'dashboard' && (
+              <DashboardPage
+                patient={currentPatient}
+                reports={reports}
+                observations={observations}
+                conflicts={conflicts}
+                summary={summary}
+                onGenerateSummary={handleGenerateSummary}
+                onOpenUpload={() => setIsUploadOpen(true)}
+                onOpenReview={openReviewModal}
+                onOpenPatientEdit={() => setIsPatientFormOpen(true)}
+                onOpenEvidenceChain={openEvidenceChain}
+                isGeneratingSummary={isGeneratingSummary}
+                setTab={setCurrentTab}
+              />
+            )}
 
-          {currentTab === 'reports' && (
-            <ReportViewerPage
-              reports={reports}
-              patient={currentPatient}
-              onOpenUpload={() => setIsUploadOpen(true)}
-              onOpenReview={openReviewModal}
-              onOpenEvidenceChain={openEvidenceChain}
-            />
-          )}
+            {currentTab === 'patients' && (
+              <PatientsPage
+                patients={patients}
+                currentPatient={currentPatient}
+                onSelectPatient={(id) => {
+                  setCurrentPatientId(id);
+                  setCurrentTab('dashboard');
+                }}
+                onNewPatient={() => {
+                  setCurrentPatient(null);
+                  setIsPatientFormOpen(true);
+                }}
+                onDeletePatient={handleDeletePatient}
+              />
+            )}
 
-          {currentTab === 'review' && (
-            <ReviewQueuePage
-              observations={observations}
-              reports={reports}
-              patient={currentPatient}
-              onOpenReview={openReviewModal}
-              onOpenEvidenceChain={openEvidenceChain}
-            />
-          )}
+            {currentTab === 'reports' && (
+              <ReportViewerPage
+                reports={reports}
+                patient={currentPatient}
+                onOpenUpload={() => setIsUploadOpen(true)}
+                onOpenReview={openReviewModal}
+                onOpenEvidenceChain={openEvidenceChain}
+              />
+            )}
 
-          {currentTab === 'timeline' && (
-            <TimelinePage
-              timeline={timeline}
-              patient={currentPatient}
-            />
-          )}
+            {currentTab === 'review' && (
+              <ReviewQueuePage
+                observations={observations}
+                reports={reports}
+                patient={currentPatient}
+                onOpenReview={openReviewModal}
+                onOpenEvidenceChain={openEvidenceChain}
+              />
+            )}
 
-          {currentTab === 'conflicts' && (
-            <ConflictsPage
-              conflicts={conflicts}
-              patient={currentPatient}
-              onResolveConflict={handleResolveConflict}
-            />
-          )}
+            {currentTab === 'timeline' && (
+              <TimelinePage
+                timeline={timeline}
+                patient={currentPatient}
+              />
+            )}
 
-          {currentTab === 'settings' && (
-            <SettingsPage />
-          )}
-        </main>
+            {currentTab === 'conflicts' && (
+              <ConflictsPage
+                conflicts={conflicts}
+                patient={currentPatient}
+                onResolveConflict={handleResolveConflict}
+              />
+            )}
+
+            {currentTab === 'settings' && (
+              <SettingsPage />
+            )}
+          </main>
+        </div>
+
+        {/* Global Command Search Dialog (Ctrl+K) */}
+        <CommandDialog
+          isOpen={isCommandOpen}
+          onClose={() => setIsCommandOpen(false)}
+          patients={patients}
+          onSelectPatient={(p) => setCurrentPatientId(p.id)}
+          onNavigate={(tab) => setCurrentTab(tab)}
+        />
+
+        {/* Modals */}
+        {isReviewOpen && selectedObservation && (
+          <ReviewModal
+            observation={selectedObservation}
+            onClose={() => {
+              setIsReviewOpen(false);
+              setSelectedObservation(null);
+            }}
+            onReviewed={handleReviewObservation}
+          />
+        )}
+
+        {isEvidenceChainOpen && evidenceObservation && (
+          <EvidenceChainModal
+            observation={evidenceObservation}
+            report={evidenceReport}
+            onClose={() => {
+              setIsEvidenceChainOpen(false);
+              setEvidenceObservation(null);
+            }}
+            onOpenReview={(obs) => {
+              setIsEvidenceChainOpen(false);
+              openReviewModal(obs);
+            }}
+          />
+        )}
+
+        {isPatientFormOpen && (
+          <PatientFormModal
+            patient={currentPatient}
+            onClose={() => setIsPatientFormOpen(false)}
+            onSaved={handleSavePatient}
+          />
+        )}
+
+        {isUploadOpen && currentPatientId && (
+          <UploadReportModal
+            patientId={currentPatientId}
+            onClose={() => setIsUploadOpen(false)}
+            onUploaded={async () => {
+              await loadPatientDetails(currentPatientId);
+              setCurrentTab('reports');
+            }}
+          />
+        )}
       </div>
-
-      {/* Global Command Search Dialog (Ctrl+K) */}
-      <CommandDialog
-        isOpen={isCommandOpen}
-        onClose={() => setIsCommandOpen(false)}
-        patients={patients}
-        onSelectPatient={(p) => setCurrentPatientId(p.id)}
-        onNavigate={(tab) => setCurrentTab(tab)}
-      />
-
-      {/* Modals */}
-      {isReviewOpen && selectedObservation && (
-        <ReviewModal
-          observation={selectedObservation}
-          onClose={() => {
-            setIsReviewOpen(false);
-            setSelectedObservation(null);
-          }}
-          onReviewed={handleReviewObservation}
-        />
-      )}
-
-      {isEvidenceChainOpen && evidenceObservation && (
-        <EvidenceChainModal
-          observation={evidenceObservation}
-          report={evidenceReport}
-          onClose={() => {
-            setIsEvidenceChainOpen(false);
-            setEvidenceObservation(null);
-          }}
-          onOpenReview={(obs) => {
-            setIsEvidenceChainOpen(false);
-            openReviewModal(obs);
-          }}
-        />
-      )}
-
-      {isPatientFormOpen && (
-        <PatientFormModal
-          patient={currentPatient}
-          onClose={() => setIsPatientFormOpen(false)}
-          onSaved={handleSavePatient}
-        />
-      )}
-
-      {isUploadOpen && currentPatientId && (
-        <UploadReportModal
-          patientId={currentPatientId}
-          onClose={() => setIsUploadOpen(false)}
-          onUploaded={async () => {
-            await loadPatientDetails(currentPatientId);
-            setCurrentTab('reports');
-          }}
-        />
-      )}
     </div>
   );
 }

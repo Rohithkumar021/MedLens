@@ -1,5 +1,5 @@
 import React from 'react';
-import { Activity, Sparkles, User, Plus, Menu, X, Search, Command } from 'lucide-react';
+import { Activity, Sparkles, User, Plus, Menu, X, Search, Command, PanelRightClose, Minimize2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Avatar, AvatarFallback } from './ui/avatar';
@@ -11,6 +11,7 @@ export default function Header({
   onNewPatient,
   onSeedDemo,
   onOpenCommand,
+  onCloseApp,
   isLoading,
   isMobileMenuOpen,
   setIsMobileMenuOpen
@@ -39,13 +40,13 @@ export default function Header({
             {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </Button>
 
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-sky-600 to-sky-700 text-white flex items-center justify-center shadow-sm border border-sky-500/20">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-emerald-700 text-white flex items-center justify-center shadow-sm border border-emerald-500/20">
             <Activity className="w-5 h-5" aria-hidden="true" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-lg font-bold tracking-tight text-slate-900">MedLens</span>
-              <Badge variant="clinical" className="text-[10px] font-bold tracking-wider uppercase">
+              <Badge variant="clinical" className="text-[10px] font-bold tracking-wider uppercase bg-emerald-50 text-emerald-800 border-emerald-200/90">
                 Clinical Intelligence
               </Badge>
             </div>
@@ -118,6 +119,20 @@ export default function Header({
             <Sparkles className="w-3.5 h-3.5" aria-hidden="true" />
             <span>Load Demo</span>
           </Button>
+
+          {/* Minimize / Slide Close Button */}
+          {onCloseApp && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onCloseApp}
+              className="text-slate-500 hover:text-slate-900 hover:bg-slate-100 h-8 w-8 ml-1"
+              title="Minimize workspace to floating launcher (Esc)"
+              aria-label="Minimize MedLens workspace"
+            >
+              <Minimize2 className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
     </header>
