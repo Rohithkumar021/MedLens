@@ -13,8 +13,22 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
 
     let animId;
     let t = 0;
+    let isVisible = true;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    }, { threshold: 0.05 });
+    observer.observe(canvas);
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     const render = () => {
+      animId = requestAnimationFrame(render);
+      if (!isVisible || document.hidden) return;
+
       t += 0.02;
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -113,11 +127,14 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.restore();
 
       ctx.restore();
-      animId = requestAnimationFrame(render);
     };
 
     animId = requestAnimationFrame(render);
-    return () => cancelAnimationFrame(animId);
+    return () => {
+      cancelAnimationFrame(animId);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   return (

@@ -289,8 +289,22 @@ export default function EvidenceConstellation({
 
     let animationFrameId;
     let lastTime = performance.now();
+    let isVisible = true;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    }, { threshold: 0.05 });
+    if (containerRef.current) observer.observe(containerRef.current);
+
+    const handleVisibility = () => {
+      isVisible = !document.hidden;
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
 
     const render = (time) => {
+      animationFrameId = requestAnimationFrame(render);
+      if (!isVisible || document.hidden) return;
+
       const dt = Math.min((time - lastTime) / 1000, 0.1);
       lastTime = time;
 
@@ -477,13 +491,14 @@ export default function EvidenceConstellation({
       });
 
       ctx.restore();
-      animationFrameId = requestAnimationFrame(render);
     };
 
     animationFrameId = requestAnimationFrame(render);
 
     return () => {
       cancelAnimationFrame(animationFrameId);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [is3DMode, filteredNodes, graphData, autoRotate, hoveredNode, selectedNode, ambientParticles, project3D]);
 

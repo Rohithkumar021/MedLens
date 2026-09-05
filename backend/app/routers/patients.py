@@ -1,5 +1,6 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from backend.app.database import get_db
@@ -17,12 +18,29 @@ router = APIRouter(prefix="/patients", tags=["Patients"])
 @router.get("", response_model=List[PatientResponse])
 def list_patients(db: Session = Depends(get_db)):
     patients = db.query(Patient).order_by(Patient.created_at.desc()).all()
+    if not patients:
+        return []
+
+    # Batch compute counts in single aggregated queries to prevent N+1 query overhead
+    rep_counts = dict(
+        db.query(MedicalReport.patient_id, func.count(MedicalReport.id))
+        .group_by(MedicalReport.patient_id)
+        .all()
+    )
+    obs_counts = dict(
+        db.query(Observation.patient_id, func.count(Observation.id))
+        .group_by(Observation.patient_id)
+        .all()
+    )
+    conf_counts = dict(
+        db.query(Conflict.patient_id, func.count(Conflict.id))
+        .filter(Conflict.status == "ACTIVE")
+        .group_by(Conflict.patient_id)
+        .all()
+    )
+
     results = []
     for p in patients:
-        rep_count = db.query(MedicalReport).filter(MedicalReport.patient_id == p.id).count()
-        obs_count = db.query(Observation).filter(Observation.patient_id == p.id).count()
-        conf_count = db.query(Conflict).filter(Conflict.patient_id == p.id, Conflict.status == "ACTIVE").count()
-        
         p_dict = {
             "id": p.id,
             "name": p.name,
@@ -37,9 +55,9 @@ def list_patients(db: Session = Depends(get_db)):
             "source": p.source,
             "created_at": p.created_at,
             "updated_at": p.updated_at,
-            "reports_count": rep_count,
-            "observations_count": obs_count,
-            "conflicts_count": conf_count
+            "reports_count": rep_counts.get(p.id, 0),
+            "observations_count": obs_counts.get(p.id, 0),
+            "conflicts_count": conf_counts.get(p.id, 0)
         }
         results.append(p_dict)
     return results
