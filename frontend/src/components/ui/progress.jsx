@@ -19,3 +19,4 @@ const Progress = React.forwardRef(({ className, value = 0, indicatorColor = "bg-
 Progress.displayName = "Progress";
 
 export { Progress };
+

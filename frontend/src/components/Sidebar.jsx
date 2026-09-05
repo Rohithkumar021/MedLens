@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, Users, FileText, Clock, AlertTriangle, CheckSquare, Settings, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Clock, AlertTriangle, CheckSquare, Settings, ShieldCheck, Shield } from 'lucide-react';
 import { Badge } from './ui/badge';
 import { Separator } from './ui/separator';
 
@@ -15,40 +15,40 @@ export default function Sidebar({
     {
       title: 'OVERVIEW',
       items: [
-        { id: 'dashboard', label: 'Clinical Dashboard', icon: LayoutDashboard },
-        { id: 'patients', label: 'Patients Workspace', icon: Users },
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'patients', label: 'Patients', icon: Users },
       ],
     },
     {
-      title: 'CLINICAL INTELLIGENCE',
+      title: 'CLINICAL RECORD',
       items: [
-        { id: 'reports', label: 'Source Reports & Facts', icon: FileText },
-        { id: 'timeline', label: 'Temporal Timeline', icon: Clock },
+        { id: 'reports', label: 'Medical Reports', icon: FileText },
+        { id: 'timeline', label: 'Patient Timeline', icon: Clock },
       ],
     },
     {
-      title: 'AUDIT & GOVERNANCE',
+      title: 'REVIEW',
       items: [
-        {
-          id: 'conflicts',
-          label: 'Safety Inconsistencies',
-          icon: AlertTriangle,
-          badge: conflictsCount,
-          badgeVariant: 'destructive',
-        },
         {
           id: 'review',
-          label: 'Human Review Queue',
+          label: 'Human Review',
           icon: CheckSquare,
           badge: unreviewedCount,
           badgeVariant: 'warning',
+        },
+        {
+          id: 'conflicts',
+          label: 'Inconsistencies',
+          icon: AlertTriangle,
+          badge: conflictsCount,
+          badgeVariant: 'destructive',
         },
       ],
     },
     {
       title: 'SYSTEM',
       items: [
-        { id: 'settings', label: 'Diagnostics & Principles', icon: Settings },
+        { id: 'settings', label: 'AI & Safety', icon: Shield },
       ],
     },
   ];

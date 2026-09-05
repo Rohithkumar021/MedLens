@@ -87,3 +87,4 @@ function TabsContent({ value, className, children, ...props }) {
 }
 
 export { Tabs, TabsList, TabsTrigger, TabsContent };
+

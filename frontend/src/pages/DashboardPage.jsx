@@ -11,7 +11,11 @@ import {
   Link2,
   CheckCircle2,
   Check,
-  Edit3
+  Edit3,
+  Users,
+  Clock,
+  ChevronRight,
+  AlertCircle
 } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
 import ProvenanceBadge from '../components/ProvenanceBadge';
@@ -22,12 +26,13 @@ import { Badge } from '../components/ui/badge';
 import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 import { Progress } from '../components/ui/progress';
 import { SpotlightCard } from '../components/ui/spotlight-card';
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from '../components/ui/table';
 
 export default function DashboardPage({
   patient,
-  reports,
-  observations,
-  conflicts,
+  reports = [],
+  observations = [],
+  conflicts = [],
   summary,
   onGenerateSummary,
   onOpenUpload,
@@ -60,6 +65,7 @@ export default function DashboardPage({
   const lowCount = observations.filter((o) => o.status === 'LOW').length;
   const notAvailableCount = observations.filter((o) => o.status === 'NOT_AVAILABLE' || o.status === 'UNKNOWN').length;
   const unreviewedCount = observations.filter((o) => !o.is_reviewed).length;
+  const attentionObservations = observations.filter((o) => !o.is_reviewed || ['HIGH', 'LOW', 'NOT_AVAILABLE'].includes(o.status));
 
   // Real Data Completeness Index Calculation (0 - 100%)
   let completenessScore = 0;
@@ -76,7 +82,7 @@ export default function DashboardPage({
           <div className="space-y-2.5">
             <div className="flex items-center gap-2">
               <Badge variant="clinical" className="text-[10px] font-bold tracking-widest uppercase">
-                Clinical Intelligence Workspace
+                Clinical Intelligence Overview
               </Badge>
               <span className="text-slate-300">·</span>
               <ProvenanceBadge provenance={patient.source || 'USER_PROVIDED'} size="sm" />
@@ -149,48 +155,40 @@ export default function DashboardPage({
         </div>
       </SpotlightCard>
 
-      {/* Metric Quick KPI Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3.5">
-        <Card className="p-4">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Reports</div>
+      {/* Primary Overview Cards (4 canonical columns) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <Card className="p-4 cursor-pointer hover:border-sky-300 transition" onClick={() => setTab('patients')}>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Patient Context</div>
+          <div className="text-2xl font-extrabold text-slate-900 mt-0.5 font-mono">1 Active</div>
+          <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
+            <Users className="w-3.5 h-3.5 text-sky-600" /> {patient.name}
+          </div>
+        </Card>
+
+        <Card className="p-4 cursor-pointer hover:border-sky-300 transition" onClick={() => setTab('reports')}>
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">Medical Reports</div>
           <div className="text-2xl font-extrabold text-slate-900 mt-0.5 font-mono">{reports.length}</div>
           <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-            <FileText className="w-3.5 h-3.5 text-sky-600" /> Extracted Docs
+            <FileText className="w-3.5 h-3.5 text-sky-600" /> Extracted Documents
           </div>
         </Card>
 
-        <Card className="p-4 border-emerald-200/80 bg-emerald-50/20">
-          <div className="text-[10px] font-bold text-emerald-700 uppercase tracking-widest font-mono">Within Range</div>
-          <div className="text-2xl font-extrabold text-emerald-700 mt-0.5 font-mono">{normalCount}</div>
-          <div className="text-[11px] text-slate-500 mt-1">Within source bounds</div>
-        </Card>
-
-        <Card className="p-4 border-rose-200/80 bg-rose-50/20">
-          <div className="text-[10px] font-bold text-rose-700 uppercase tracking-widest font-mono">Out of Range</div>
-          <div className="text-2xl font-extrabold text-rose-700 mt-0.5 font-mono">{highCount + lowCount}</div>
+        <Card className="p-4 cursor-pointer hover:border-amber-300 transition border-amber-200/80 bg-amber-50/20" onClick={() => setTab('review')}>
+          <div className="text-[10px] font-bold text-amber-800 uppercase tracking-widest font-mono">Pending Reviews</div>
+          <div className="text-2xl font-extrabold text-amber-800 mt-0.5 font-mono">{unreviewedCount}</div>
           <div className="text-[11px] text-slate-500 mt-1">
-            <span className="text-rose-700 font-bold">{highCount} High</span> · <span className="text-amber-700 font-bold">{lowCount} Low</span>
+            {unreviewedCount > 0 ? 'Awaiting verification' : 'All verified'}
           </div>
         </Card>
 
-        <Card className="p-4">
-          <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest font-mono">Ref Not Provided</div>
-          <div className="text-2xl font-extrabold text-slate-800 mt-0.5 font-mono">{notAvailableCount}</div>
-          <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1" title="MedLens never invents reference ranges">
-            <HelpCircle className="w-3.5 h-3.5 text-slate-400" /> Status: NOT AVAILABLE
-          </div>
-        </Card>
-
-        <Card className="p-4 col-span-2 sm:col-span-1 border-amber-200/80 bg-amber-50/20">
-          <div className="text-[10px] font-bold text-amber-800 uppercase tracking-widest font-mono">Inconsistencies</div>
-          <div className="text-2xl font-extrabold text-amber-700 mt-0.5 font-mono">{conflicts.length}</div>
+        <Card className="p-4 cursor-pointer hover:border-rose-300 transition border-rose-200/80 bg-rose-50/20" onClick={() => setTab('conflicts')}>
+          <div className="text-[10px] font-bold text-rose-800 uppercase tracking-widest font-mono">Clinical Inconsistencies</div>
+          <div className="text-2xl font-extrabold text-rose-700 mt-0.5 font-mono">{conflicts.length}</div>
           <div className="text-[11px] text-slate-500 mt-1">
             {conflicts.length > 0 ? (
-              <button onClick={() => setTab('conflicts')} className="text-amber-700 font-bold hover:underline">
-                Review Clashes →
-              </button>
+              <span className="text-rose-700 font-bold">{conflicts.length} Active Conflict(s)</span>
             ) : (
-              'No active clashes'
+              'No clashes detected'
             )}
           </div>
         </Card>
@@ -251,9 +249,14 @@ export default function DashboardPage({
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <CardTitle className="text-sm font-bold text-slate-900">Clinical Information Summary</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <CardTitle className="text-sm font-bold text-slate-900">AI-Generated Clinical Summary</CardTitle>
+                    <Badge variant="clinical" className="text-[10px] uppercase font-mono">
+                      AI GENERATED
+                    </Badge>
+                  </div>
                   <CardDescription className="text-[11px] text-slate-500">
-                    AI synthesis based strictly on structured records &amp; report-stated reference intervals
+                    Non-diagnostic synthesis based strictly on structured records &amp; report-stated reference intervals
                   </CardDescription>
                 </div>
               </div>
@@ -438,6 +441,147 @@ export default function DashboardPage({
 
           <CardFooter className="pt-3 border-t border-slate-100 text-center justify-center">
             <span className="text-[11px] text-slate-400">Click "Evidence" on any observation to inspect the Traceable Evidence Chain</span>
+          </CardFooter>
+        </Card>
+      </div>
+
+      {/* Clinical Attention & Recent Activity Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        {/* Clinical Attention Table */}
+        <Card>
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-600" />
+                <CardTitle className="text-sm font-bold text-slate-900">Clinical Attention</CardTitle>
+              </div>
+              <Badge variant="warning" className="text-xs font-mono font-bold">
+                {attentionObservations.length + conflicts.length} Items
+              </Badge>
+            </div>
+            <CardDescription className="text-[11px] text-slate-500">
+              Observations needing human verification, out-of-range biomarkers, or unsupplied reference bounds
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Observation</TableHead>
+                  <TableHead>Value / Ref</TableHead>
+                  <TableHead>Evaluation</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {attentionObservations.length === 0 && conflicts.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-6 text-xs text-slate-400">
+                      No clinical attention items active. All records are verified and within normal stated bounds.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  attentionObservations.slice(0, 5).map((obs) => (
+                    <TableRow key={obs.id}>
+                      <TableCell className="font-bold text-xs text-slate-900">
+                        {obs.test_name}
+                      </TableCell>
+                      <TableCell className="text-xs font-mono">
+                        <span className="font-bold text-sky-700">{obs.corrected_value || obs.value_text}</span>
+                        <div className="text-[10.5px] text-slate-500">{obs.original_reference_range || 'Ref N/A'}</div>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge status={obs.corrected_status || obs.status} size="sm" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => onOpenReview(obs)}
+                          className="text-xs h-7 px-2"
+                        >
+                          Review
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter className="pt-2 border-t border-slate-100 flex justify-end">
+            <Button variant="ghost" size="sm" onClick={() => setTab('review')} className="text-xs text-sky-600 font-semibold">
+              View All In Review Queue <ChevronRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
+          </CardFooter>
+        </Card>
+
+        {/* Recent Activity Table */}
+        <Card>
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-sky-600" />
+                <CardTitle className="text-sm font-bold text-slate-900">Recent Clinical Activity</CardTitle>
+              </div>
+              <Badge variant="outline" className="text-xs font-mono font-bold">
+                {reports.length} Reports
+              </Badge>
+            </div>
+            <CardDescription className="text-[11px] text-slate-500">
+              Chronological log of document ingestions, human reviews, and AI synthesis runs
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Event</TableHead>
+                  <TableHead>Document / Lab</TableHead>
+                  <TableHead>Origin</TableHead>
+                  <TableHead className="text-right">Action</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {reports.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="text-center py-6 text-xs text-slate-400">
+                      No document activity recorded. Upload a report to start.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  reports.slice(0, 5).map((rep) => (
+                    <TableRow key={rep.id}>
+                      <TableCell className="text-xs">
+                        <div className="font-bold text-slate-900">{rep.title}</div>
+                        <div className="text-[10.5px] text-slate-500 font-mono">{rep.report_date || 'Date N/A'}</div>
+                      </TableCell>
+                      <TableCell className="text-xs text-slate-600">
+                        {rep.laboratory_name || 'Apex Diagnostics'}
+                      </TableCell>
+                      <TableCell>
+                        <ProvenanceBadge provenance={rep.provenance} size="sm" />
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setTab('reports')}
+                          className="text-xs text-sky-600 h-7 px-2"
+                        >
+                          View
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+          <CardFooter className="pt-2 border-t border-slate-100 flex justify-end">
+            <Button variant="ghost" size="sm" onClick={() => setTab('timeline')} className="text-xs text-sky-600 font-semibold">
+              View Full Timeline <ChevronRight className="w-3.5 h-3.5 ml-1" />
+            </Button>
           </CardFooter>
         </Card>
       </div>
