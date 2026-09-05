@@ -44,7 +44,7 @@ export default function EvidenceConstellation({
     dragDistance: 0
   });
 
-  // Build real 3D graph dataset from real MedLens entities
+  // Build real graph dataset from real MedLens entities
   const graphData = useMemo(() => {
     if (!patient) return { nodes: [], links: [] };
 
@@ -57,8 +57,8 @@ export default function EvidenceConstellation({
       label: patient.name || 'Patient',
       sublabel: `${patient.sex || 'Unspecified'}, ${patient.age || 'N/A'} yrs`,
       type: 'patient',
-      color: '#38bdf8', // Sky 400
-      glowColor: 'rgba(56, 189, 248, 0.4)',
+      color: '#0284c7', // Brand medical blue
+      glowColor: 'rgba(2, 132, 199, 0.25)',
       radius: 20,
       x: 0,
       y: 0,
@@ -76,8 +76,8 @@ export default function EvidenceConstellation({
         label: rep.title || 'Laboratory Report',
         sublabel: rep.report_date || 'Source Document',
         type: 'report',
-        color: '#0284c7', // Brand 600
-        glowColor: 'rgba(2, 132, 199, 0.45)',
+        color: '#475569', // Slate 600
+        glowColor: 'rgba(71, 85, 105, 0.2)',
         radius: 14,
         x: Math.cos(angle) * 140,
         y: (i % 2 === 0 ? 30 : -30),
@@ -88,7 +88,7 @@ export default function EvidenceConstellation({
       links.push({
         source: 'patient-core',
         target: repNode.id,
-        color: 'rgba(56, 189, 248, 0.45)',
+        color: 'rgba(2, 132, 199, 0.25)',
         type: 'hierarchy'
       });
     });
@@ -101,20 +101,19 @@ export default function EvidenceConstellation({
         ? (repIndex / Math.max(1, reportCount)) * Math.PI * 2 + ((i % 5) - 2) * 0.35
         : (i / Math.max(1, obsCount)) * Math.PI * 2;
 
-      let obsColor = '#10b981'; // Emerald 500 (Normal)
-      let obsGlow = 'rgba(16, 185, 129, 0.4)';
+      let obsColor = '#16a34a'; // Green 600 (Normal)
+      let obsGlow = 'rgba(22, 163, 74, 0.2)';
       if (obs.status === 'HIGH') {
-        obsColor = '#f59e0b'; // Amber 500
-        obsGlow = 'rgba(245, 158, 11, 0.45)';
+        obsColor = '#d97706'; // Amber 600
+        obsGlow = 'rgba(217, 119, 6, 0.25)';
       } else if (obs.status === 'LOW') {
-        obsColor = '#06b6d4'; // Cyan 500
-        obsGlow = 'rgba(6, 182, 212, 0.45)';
+        obsColor = '#0284c7'; // Sky 600
+        obsGlow = 'rgba(2, 132, 199, 0.25)';
       } else if (obs.status === 'NOT_AVAILABLE' || obs.status === 'UNKNOWN') {
         obsColor = '#94a3b8'; // Slate 400
-        obsGlow = 'rgba(148, 163, 184, 0.35)';
+        obsGlow = 'rgba(148, 163, 184, 0.2)';
       }
 
-      // Height variation based on index
       const yPos = ((i % 4) - 1.5) * 45;
       const obsRadius = obs.is_reviewed ? 11 : 13;
 
@@ -135,7 +134,6 @@ export default function EvidenceConstellation({
       };
       nodes.push(obsNode);
 
-      // Connect observation to its originating report or patient
       if (repIndex >= 0) {
         links.push({
           source: `report-${reports[repIndex].id}`,
@@ -147,7 +145,7 @@ export default function EvidenceConstellation({
         links.push({
           source: 'patient-core',
           target: obsNode.id,
-          color: 'rgba(148, 163, 184, 0.3)',
+          color: 'rgba(148, 163, 184, 0.25)',
           type: 'extraction'
         });
       }
@@ -158,82 +156,92 @@ export default function EvidenceConstellation({
       const angle = Math.PI * 0.75 + i * 0.6;
       const confNode = {
         id: `conf-${conf.id}`,
-        label: `Inconsistency: ${conf.conflict_type}`,
+        label: conf.conflict_type.replace(/_/g, ' '),
         sublabel: conf.description,
         type: 'conflict',
-        color: '#f43f5e', // Rose 500
-        glowColor: 'rgba(244, 63, 94, 0.6)',
-        radius: 14,
-        x: Math.cos(angle) * 190,
-        y: 80 + i * 30,
-        z: Math.sin(angle) * 190,
+        color: '#dc2626', // Red 600
+        glowColor: 'rgba(220, 38, 38, 0.25)',
+        radius: 15,
+        x: Math.cos(angle) * 310,
+        y: ((i % 2) - 0.5) * 60,
+        z: Math.sin(angle) * 310,
         data: conf
       };
       nodes.push(confNode);
 
-      // Connect conflict with patient core
       links.push({
         source: 'patient-core',
         target: confNode.id,
-        color: 'rgba(244, 63, 94, 0.6)',
-        type: 'conflict',
-        dashed: true
+        color: 'rgba(220, 38, 38, 0.4)',
+        dashed: true,
+        type: 'conflict'
       });
     });
 
-    // 5. AI Summary Node (Ascended Satellite Node)
+    // 5. Synthesized Clinical Summary Node
     if (summary) {
       const sumNode = {
-        id: 'summary-node',
-        label: 'Clinical AI Synthesis',
-        sublabel: `${summary.model_name || 'Gemini'} (Non-diagnostic)`,
+        id: 'summary-core',
+        label: 'Clinical Synthesis',
+        sublabel: 'Grounded Evidence Summary',
         type: 'summary',
-        color: '#a855f7', // Purple 500
-        glowColor: 'rgba(168, 85, 247, 0.5)',
-        radius: 15,
+        color: '#7c3aed', // Purple 600
+        glowColor: 'rgba(124, 58, 237, 0.25)',
+        radius: 16,
         x: 0,
-        y: -160,
-        z: 60,
+        y: 130,
+        z: 0,
         data: summary
       };
       nodes.push(sumNode);
+
       links.push({
         source: 'patient-core',
         target: sumNode.id,
-        color: 'rgba(168, 85, 247, 0.5)',
-        type: 'synthesis',
-        dashed: true
+        color: 'rgba(124, 58, 237, 0.35)',
+        type: 'synthesis'
       });
     }
 
     return { nodes, links };
   }, [patient, reports, observations, conflicts, summary]);
 
-  // Filter nodes based on active filterType
+  // Filter nodes based on user selection
   const filteredNodes = useMemo(() => {
     if (filterType === 'ALL') return graphData.nodes;
     if (filterType === 'ABNORMAL') {
-      return graphData.nodes.filter(n => n.type === 'patient' || (n.type === 'observation' && (n.status === 'HIGH' || n.status === 'LOW')));
+      return graphData.nodes.filter(n =>
+        n.type === 'patient' ||
+        n.type === 'report' ||
+        (n.type === 'observation' && (n.status === 'HIGH' || n.status === 'LOW')) ||
+        n.type === 'conflict'
+      );
     }
     if (filterType === 'REVIEW') {
-      return graphData.nodes.filter(n => n.type === 'patient' || (n.type === 'observation' && !n.isReviewed));
+      return graphData.nodes.filter(n =>
+        n.type === 'patient' ||
+        n.type === 'report' ||
+        (n.type === 'observation' && !n.isReviewed)
+      );
     }
     if (filterType === 'CONFLICTS') {
-      return graphData.nodes.filter(n => n.type === 'patient' || n.type === 'conflict');
+      return graphData.nodes.filter(n =>
+        n.type === 'patient' || n.type === 'conflict'
+      );
     }
     return graphData.nodes;
   }, [graphData.nodes, filterType]);
 
-  // Background Ambient Dust Particles (3D Starfield/Telemetry)
+  // Generate subtle ambient dust particles
   const ambientParticles = useMemo(() => {
     const pts = [];
-    for (let i = 0; i < 90; i++) {
+    for (let i = 0; i < 40; i++) {
       pts.push({
         x: (Math.random() - 0.5) * 800,
         y: (Math.random() - 0.5) * 600,
         z: (Math.random() - 0.5) * 800,
-        size: Math.random() * 1.5 + 0.5,
-        opacity: Math.random() * 0.35 + 0.1
+        size: 1 + Math.random() * 2,
+        opacity: 0.15 + Math.random() * 0.2
       });
     }
     return pts;
@@ -241,19 +249,16 @@ export default function EvidenceConstellation({
 
   // 3D Math Projection Function
   const project3D = useCallback((x, y, z, width, height, rotX, rotY, zoom, panX, panY) => {
-    // 1. Rotate around Y-axis (Yaw)
     const cosY = Math.cos(rotY);
     const sinY = Math.sin(rotY);
     const x1 = x * cosY - z * sinY;
     const z1 = z * cosY + x * sinY;
 
-    // 2. Rotate around X-axis (Pitch)
     const cosX = Math.cos(rotX);
     const sinX = Math.sin(rotX);
     const y2 = y * cosX - z1 * sinX;
     const z2 = z1 * cosX + y * sinX;
 
-    // 3. Perspective Projection
     const fov = 500;
     const distance = 600;
     const perspective = fov / (fov + z2 + distance);
@@ -302,10 +307,10 @@ export default function EvidenceConstellation({
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Smooth Camera Interpolation (Dampening)
+      // Smooth Camera Interpolation
       const cam = cameraRef.current;
       if (autoRotate && !cam.isDragging && !hoveredNode) {
-        cam.targetRotY += 0.003;
+        cam.targetRotY += 0.0025;
       }
 
       cam.rotX += (cam.targetRotX - cam.rotX) * 0.1;
@@ -314,16 +319,16 @@ export default function EvidenceConstellation({
       cam.panX += (cam.targetPanX - cam.panX) * 0.1;
       cam.panY += (cam.targetPanY - cam.panY) * 0.1;
 
-      // 1. Clear with Deep Clinical Slate Gradient
-      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 50, width / 2, height / 2, Math.max(width, height) * 0.8);
-      bgGrad.addColorStop(0, '#0f172a');
-      bgGrad.addColorStop(1, '#020617');
+      // 1. Clear with Clean Light Clinical Background Gradient
+      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 60, width / 2, height / 2, Math.max(width, height) * 0.8);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(1, '#f1f5f9');
       ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
-      // 2. Draw Subtle Spatial Telemetry Grid & Concentric Orbital Rings
+      // 2. Draw Concentric Orbital Clinical Reference Rings
       ctx.save();
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.06)';
+      ctx.strokeStyle = 'rgba(2, 132, 199, 0.12)';
       ctx.lineWidth = 1;
       [140, 240, 320].forEach((radius) => {
         ctx.beginPath();
@@ -340,11 +345,11 @@ export default function EvidenceConstellation({
       });
       ctx.restore();
 
-      // 3. Render Ambient Spatial Particles
+      // 3. Render Ambient Spatial Dots
       ambientParticles.forEach((p) => {
         const pt = project3D(p.x, p.y, p.z, width, height, cam.rotX, cam.rotY, cam.zoom, cam.panX, cam.panY);
         if (pt.visible) {
-          ctx.fillStyle = `rgba(186, 230, 253, ${p.opacity * Math.min(1, pt.scale)})`;
+          ctx.fillStyle = `rgba(14, 165, 233, ${p.opacity * Math.min(1, pt.scale)})`;
           ctx.beginPath();
           ctx.arc(pt.x, pt.y, p.size * pt.scale, 0, Math.PI * 2);
           ctx.fill();
@@ -371,7 +376,6 @@ export default function EvidenceConstellation({
         return pNode;
       });
 
-      // Sort by depth (back to front) for correct alpha blending
       projectedNodes.sort((a, b) => b.depth - a.depth);
 
       // 5. Draw 3D Connection Lines
@@ -388,24 +392,20 @@ export default function EvidenceConstellation({
         if (link.dashed) {
           ctx.setLineDash([4, 4]);
         }
-        ctx.strokeStyle = isHighlighted ? '#38bdf8' : (link.color || 'rgba(148, 163, 184, 0.25)');
+        ctx.strokeStyle = isHighlighted ? '#0284c7' : (link.color || 'rgba(148, 163, 184, 0.4)');
         ctx.lineWidth = isHighlighted ? 2.5 : 1.2;
 
-        // Quadratic Bezier Curve for smooth spatial routing
         const midX = (sourceNode.screenX + targetNode.screenX) / 2;
         const midY = (sourceNode.screenY + targetNode.screenY) / 2 - 15 * sourceNode.scale;
         ctx.moveTo(sourceNode.screenX, sourceNode.screenY);
         ctx.quadraticCurveTo(midX, midY, targetNode.screenX, targetNode.screenY);
         ctx.stroke();
 
-        // If highlighted, draw animated energy pulse dot
         if (isHighlighted) {
           const pulseT = ((time * 0.001) % 1);
           const px = (1 - pulseT) * (1 - pulseT) * sourceNode.screenX + 2 * (1 - pulseT) * pulseT * midX + pulseT * pulseT * targetNode.screenX;
           const py = (1 - pulseT) * (1 - pulseT) * sourceNode.screenY + 2 * (1 - pulseT) * pulseT * midY + pulseT * pulseT * targetNode.screenY;
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 8;
+          ctx.fillStyle = '#0284c7';
           ctx.beginPath();
           ctx.arc(px, py, 3.5, 0, Math.PI * 2);
           ctx.fill();
@@ -422,34 +422,34 @@ export default function EvidenceConstellation({
         ctx.save();
         ctx.translate(node.screenX, node.screenY);
 
-        // A. Ambient Outer Glow
-        const glow = ctx.createRadialGradient(0, 0, currentRadius * 0.2, 0, 0, currentRadius * 2.4);
-        glow.addColorStop(0, node.glowColor || 'rgba(56, 189, 248, 0.4)');
-        glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        // A. Subtle Soft Halo
+        const glow = ctx.createRadialGradient(0, 0, currentRadius * 0.2, 0, 0, currentRadius * 2.2);
+        glow.addColorStop(0, node.glowColor || 'rgba(2, 132, 199, 0.2)');
+        glow.addColorStop(1, 'rgba(255, 255, 255, 0)');
         ctx.fillStyle = glow;
         ctx.beginPath();
-        ctx.arc(0, 0, currentRadius * 2.4, 0, Math.PI * 2);
+        ctx.arc(0, 0, currentRadius * 2.2, 0, Math.PI * 2);
         ctx.fill();
 
-        // B. Node Sphere Core with 3D Light Highlight
+        // B. Node Sphere Core
         const coreGrad = ctx.createRadialGradient(-currentRadius * 0.3, -currentRadius * 0.3, currentRadius * 0.1, 0, 0, currentRadius);
         coreGrad.addColorStop(0, '#ffffff');
-        coreGrad.addColorStop(0.3, node.color);
-        coreGrad.addColorStop(1, '#020617');
+        coreGrad.addColorStop(0.4, node.color);
+        coreGrad.addColorStop(1, '#0f172a');
 
         ctx.fillStyle = coreGrad;
         ctx.beginPath();
         ctx.arc(0, 0, currentRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        // C. Outer Ring & Selection Aura
+        // C. Outer Border Ring
         ctx.lineWidth = node.isSelected ? 3 : (node.isHovered ? 2 : 1.2);
-        ctx.strokeStyle = node.isSelected ? '#ffffff' : (node.isHovered ? '#7dd3fc' : 'rgba(255, 255, 255, 0.4)');
+        ctx.strokeStyle = node.isSelected ? '#0284c7' : (node.isHovered ? '#38bdf8' : 'rgba(255, 255, 255, 0.9)');
         ctx.stroke();
 
-        // D. Node Label Badge (High legibility)
+        // D. Node Label Badge (Crisp Light Pill)
         if (node.scale > 0.45 || node.isHovered || node.isSelected || node.type === 'patient') {
-          ctx.font = `${node.type === 'patient' ? 'bold 12px' : '600 10.5px'} Inter, system-ui, sans-serif`;
+          ctx.font = `${node.type === 'patient' ? 'bold 12px' : '600 10.5px'} 'Plus Jakarta Sans', system-ui, sans-serif`;
           ctx.textAlign = 'center';
           ctx.textBaseline = 'middle';
 
@@ -460,8 +460,8 @@ export default function EvidenceConstellation({
           const padY = 3;
 
           // Label Pill Background
-          ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-          ctx.strokeStyle = node.isSelected ? '#38bdf8' : 'rgba(71, 85, 105, 0.5)';
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.96)';
+          ctx.strokeStyle = node.isSelected ? '#0284c7' : '#cbd5e1';
           ctx.lineWidth = 1;
           ctx.beginPath();
           ctx.roundRect(-metrics.width / 2 - padX, textY - 8 - padY, metrics.width + padX * 2, 16 + padY * 2, 4);
@@ -469,7 +469,7 @@ export default function EvidenceConstellation({
           ctx.stroke();
 
           // Label Text
-          ctx.fillStyle = node.isSelected ? '#ffffff' : '#f8fafc';
+          ctx.fillStyle = node.isSelected ? '#0284c7' : '#0f172a';
           ctx.fillText(text, 0, textY);
         }
 
@@ -515,7 +515,6 @@ export default function EvidenceConstellation({
       return;
     }
 
-    // Raycast / Hit-test nearest node
     let closestNode = null;
     let minDist = Infinity;
 
@@ -538,7 +537,6 @@ export default function EvidenceConstellation({
     const cam = cameraRef.current;
     cam.isDragging = false;
 
-    // If it was a clean click without significant drag
     if (cam.dragDistance < 5 && hoveredNode) {
       handleNodeClick(hoveredNode);
     }
@@ -553,7 +551,6 @@ export default function EvidenceConstellation({
 
   const handleNodeClick = (node) => {
     setSelectedNode(node);
-    // Smoothly pan camera to center the clicked entity
     const cam = cameraRef.current;
     cam.targetPanX = -node.x * 0.5;
     cam.targetPanY = -node.y * 0.5;
@@ -569,12 +566,10 @@ export default function EvidenceConstellation({
     setSelectedNode(null);
   };
 
-  // Keyboard navigation & accessibility
+  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (e.key === 'Escape') {
-        handleResetCamera();
-      } else if (e.key === 'r' || e.key === 'R') {
+      if (e.key === 'Escape' || e.key === 'r' || e.key === 'R') {
         handleResetCamera();
       } else if (e.key === ' ') {
         setAutoRotate((prev) => !prev);
@@ -590,9 +585,9 @@ export default function EvidenceConstellation({
         <div className="flex justify-end">
           <button
             onClick={() => setIs3DMode(true)}
-            className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-sky-400 text-xs font-bold rounded-xl border border-slate-700 flex items-center gap-1.5 transition"
+            className="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-brand-700 text-xs font-bold rounded-lg border border-slate-300 flex items-center gap-1.5 transition shadow-subtle"
           >
-            <Layers className="w-3.5 h-3.5" /> Switch to 3D Spatial View
+            <Layers className="w-3.5 h-3.5 text-brand-600" /> Switch to 3D Clinical Graph
           </button>
         </div>
         <VisualizationFallback
@@ -613,7 +608,7 @@ export default function EvidenceConstellation({
   return (
     <div
       ref={containerRef}
-      className={`relative w-full rounded-2xl overflow-hidden border border-slate-800 shadow-elevation transition-all ${
+      className={`relative w-full rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-card transition-all ${
         isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen' : 'h-[460px] sm:h-[520px]'
       }`}
     >
@@ -625,21 +620,21 @@ export default function EvidenceConstellation({
         onMouseUp={handleMouseUp}
         onWheel={handleWheel}
         className="w-full h-full block select-none touch-none"
-        aria-label="Interactive 3D Evidence Constellation Map"
+        aria-label="Interactive 3D Clinical Information Graph"
       />
 
       {/* Top Floating Header & Filter Toolbar */}
       <div className="absolute top-4 left-4 z-30 flex flex-wrap items-center gap-2">
-        <div className="bg-slate-900/90 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-700/80 flex items-center gap-2 shadow-lg">
-          <Sparkles className="w-4 h-4 text-sky-400" />
-          <span className="text-xs font-extrabold text-white tracking-tight">Evidence Constellation</span>
-          <span className="text-[10px] font-mono text-slate-400 px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700">
+        <div className="bg-white/95 backdrop-blur-md px-3.5 py-1.5 rounded-lg border border-slate-200 flex items-center gap-2 shadow-subtle">
+          <Sparkles className="w-4 h-4 text-brand-600" />
+          <span className="text-xs font-extrabold text-slate-900 tracking-tight">Clinical Evidence Map</span>
+          <span className="text-[10px] font-mono text-slate-600 px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200">
             {filteredNodes.length} Nodes
           </span>
         </div>
 
         {/* Filter Pills */}
-        <div className="hidden sm:flex items-center gap-1 bg-slate-900/80 backdrop-blur-md p-1 rounded-xl border border-slate-700/80 text-xs">
+        <div className="hidden sm:flex items-center gap-1 bg-white/95 backdrop-blur-md p-1 rounded-lg border border-slate-200 text-xs shadow-subtle">
           {[
             { id: 'ALL', label: 'All Entities' },
             { id: 'ABNORMAL', label: 'Abnormal Only' },
@@ -649,10 +644,10 @@ export default function EvidenceConstellation({
             <button
               key={f.id}
               onClick={() => setFilterType(f.id)}
-              className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition ${
+              className={`px-2.5 py-1 rounded-md font-bold text-[11px] transition ${
                 filterType === f.id
-                  ? 'bg-sky-500/20 text-sky-300 border border-sky-400/40'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'bg-sky-50 text-brand-700 border border-sky-200 shadow-subtle'
+                  : 'text-slate-600 hover:text-slate-900'
               }`}
             >
               {f.label}
@@ -662,12 +657,12 @@ export default function EvidenceConstellation({
       </div>
 
       {/* Right Action Controls Toolbar */}
-      <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 bg-slate-900/80 backdrop-blur-md p-1.5 rounded-xl border border-slate-700/80 shadow-lg">
+      <div className="absolute top-4 right-4 z-30 flex items-center gap-1.5 bg-white/95 backdrop-blur-md p-1.5 rounded-lg border border-slate-200 shadow-subtle">
         <button
           onClick={() => setAutoRotate((prev) => !prev)}
           title={autoRotate ? 'Pause Orbit Rotation (Space)' : 'Start Auto-Orbit (Space)'}
-          className={`p-1.5 rounded-lg text-xs font-bold transition ${
-            autoRotate ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-white'
+          className={`p-1.5 rounded-md text-xs font-bold transition ${
+            autoRotate ? 'bg-sky-50 text-brand-700 border border-sky-200' : 'text-slate-600 hover:text-slate-900'
           }`}
           aria-label="Toggle auto-orbit"
         >
@@ -677,7 +672,7 @@ export default function EvidenceConstellation({
         <button
           onClick={handleResetCamera}
           title="Reset Camera View (R / Esc)"
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+          className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition"
           aria-label="Reset camera"
         >
           <RotateCcw className="w-4 h-4" />
@@ -686,8 +681,8 @@ export default function EvidenceConstellation({
         <button
           onClick={() => setShowLegend((prev) => !prev)}
           title="Toggle Legend & Telemetry Key"
-          className={`p-1.5 rounded-lg transition ${
-            showLegend ? 'bg-sky-500/20 text-sky-300' : 'text-slate-400 hover:text-white'
+          className={`p-1.5 rounded-md transition ${
+            showLegend ? 'bg-sky-50 text-brand-700 border border-sky-200' : 'text-slate-600 hover:text-slate-900'
           }`}
           aria-label="Toggle legend"
         >
@@ -697,7 +692,7 @@ export default function EvidenceConstellation({
         <button
           onClick={() => setIs3DMode(false)}
           title="Switch to 2D High-Contrast Matrix"
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+          className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition"
           aria-label="Switch to 2D View"
         >
           <Layers className="w-4 h-4" />
@@ -706,7 +701,7 @@ export default function EvidenceConstellation({
         <button
           onClick={() => setIsFullscreen((prev) => !prev)}
           title={isFullscreen ? 'Exit Fullscreen' : 'Expand Fullscreen'}
-          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition"
+          className="p-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition"
           aria-label="Toggle fullscreen"
         >
           {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -716,7 +711,7 @@ export default function EvidenceConstellation({
       {/* Floating Interactive Hover Tooltip */}
       {hoveredNode && !selectedNode && (
         <div
-          className="absolute pointer-events-none z-30 bg-slate-900/95 backdrop-blur-md border border-slate-700/90 text-white px-3 py-2 rounded-xl shadow-2xl text-xs -translate-x-1/2 -translate-y-full mb-3 animate-fade-in"
+          className="absolute pointer-events-none z-30 bg-white/95 backdrop-blur-md border border-slate-300 text-slate-900 px-3 py-2 rounded-lg shadow-lg text-xs -translate-x-1/2 -translate-y-full mb-3 animate-modal-in"
           style={{
             left: `${hoveredNode.screenX}px`,
             top: `${hoveredNode.screenY - 10}px`
@@ -724,10 +719,10 @@ export default function EvidenceConstellation({
         >
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full" style={{ backgroundColor: hoveredNode.color }} />
-            <span className="font-extrabold text-white">{hoveredNode.label}</span>
+            <span className="font-extrabold text-slate-900">{hoveredNode.label}</span>
           </div>
-          <div className="text-[11px] text-slate-300 mt-0.5 font-mono">{hoveredNode.sublabel}</div>
-          <div className="text-[10px] text-sky-400 mt-1 font-semibold flex items-center gap-1">
+          <div className="text-[11px] text-slate-600 mt-0.5 font-mono">{hoveredNode.sublabel}</div>
+          <div className="text-[10px] text-brand-600 mt-1 font-semibold flex items-center gap-1">
             <span>Click node to inspect evidence &amp; actions</span>
           </div>
         </div>
@@ -755,58 +750,57 @@ export default function EvidenceConstellation({
 
       {/* Spatial Legend & Controls Key Overlay */}
       {showLegend && (
-        <div className="absolute bottom-12 left-4 z-30 bg-slate-900/95 backdrop-blur-md p-4 rounded-xl border border-slate-700/90 text-white text-xs max-w-xs shadow-2xl animate-fade-in space-y-2">
-          <div className="font-extrabold text-sky-400 uppercase tracking-wider text-[10px] pb-1 border-b border-slate-800">
-            Spatial Telemetry Legend
+        <div className="absolute bottom-12 left-4 z-30 bg-white/95 backdrop-blur-md p-4 rounded-xl border border-slate-200 text-slate-800 text-xs max-w-xs shadow-xl animate-modal-in space-y-2">
+          <div className="font-extrabold text-brand-700 uppercase tracking-wider text-[10px] pb-1 border-b border-slate-200">
+            Clinical Data Map Legend
           </div>
           <div className="grid grid-cols-2 gap-2 text-[11px]">
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-sky-400" />
+              <span className="w-2.5 h-2.5 rounded-full bg-brand-600" />
               <span>Patient Core</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-600" />
+              <span className="w-2.5 h-2.5 rounded-full bg-slate-600" />
               <span>Source Report</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
               <span>Normal Biomarker</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-600" />
               <span>High Biomarker</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-cyan-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-600" />
               <span>Low Biomarker</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-600" />
               <span>Inconsistency</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-500" />
+              <span className="w-2.5 h-2.5 rounded-full bg-purple-600" />
               <span>AI Summary</span>
             </div>
           </div>
-          <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-400 leading-tight">
-            <strong>Controls:</strong> Drag to rotate · Scroll to zoom · Click to inspect · Double-click to open · Esc to reset
+          <div className="pt-2 border-t border-slate-200 text-[10px] text-slate-500 leading-tight">
+            <strong>Controls:</strong> Drag to rotate · Scroll to zoom · Click to inspect · Esc to reset
           </div>
         </div>
       )}
 
       {/* Bottom Telemetry Status Bar */}
-      <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between pointer-events-none text-[10.5px] font-mono text-slate-400">
-        <div className="bg-slate-900/80 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-slate-800/80 flex items-center gap-2 pointer-events-auto">
-          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-          <span>REAL-TIME EVIDENCE TOPOLOGY</span>
+      <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between pointer-events-none text-[10.5px] font-mono text-slate-500">
+        <div className="bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-md border border-slate-200 flex items-center gap-2 pointer-events-auto shadow-subtle">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-600" />
+          <span>STRUCTURED CLINICAL GRAPH</span>
         </div>
 
-        <div className="hidden sm:flex bg-slate-900/80 backdrop-blur-xs px-2.5 py-1 rounded-lg border border-slate-800/80 items-center gap-2 pointer-events-auto">
+        <div className="hidden sm:flex bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-md border border-slate-200 items-center gap-2 pointer-events-auto shadow-subtle">
           <span>Drag to orbit · Scroll to zoom</span>
         </div>
       </div>
     </div>
   );
 }
-

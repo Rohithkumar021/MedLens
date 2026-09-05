@@ -5,20 +5,18 @@
 @layer base {
   :root {
     --brand-primary: #0284c7;
-    --brand-cyan: #38bdf8;
-    --bg-obsidian: #020617;
-    --bg-surface: #090d16;
+    --brand-cyan: #0ea5e9;
+    --bg-base: #f8fafc;
+    --bg-surface: #ffffff;
   }
 
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     color: #0f172a;
     background-color: #f8fafc;
-    color: #f8fafc;
-    background-color: #020617;
     background-image: 
-      radial-gradient(at 50% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 60%),
-      radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+      radial-gradient(at 50% 0%, rgba(2, 132, 199, 0.03) 0px, transparent 60%),
+      radial-gradient(at 100% 100%, rgba(14, 165, 233, 0.02) 0px, transparent 50%);
     background-attachment: fixed;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -29,45 +27,37 @@
   }
 
   /* Accessible focus outline */
-  /* Accessible focus outline with electric cyan glow */
   button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: 2px solid #0284c7;
-    outline: 2px solid #38bdf8;
     outline-offset: 2px;
   }
 }
 
-/* Custom crisp scrollbars */
-/* Custom dark glass scrollbars */
+/* Custom crisp light scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
-  width: 5px;
-  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
   background: #f1f5f9;
-  background: rgba(15, 23, 42, 0.6);
 }
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  background: rgba(71, 85, 105, 0.5);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
-  background: rgba(148, 163, 184, 0.8);
 }
 
 /* Fine subtle telemetry grid background utility */
 .bg-grid-telemetry {
   background-size: 32px 32px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(15, 23, 42, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(15, 23, 42, 0.03) 1px, transparent 1px);
 }
 
 /* Micro animations for modals and drawer */

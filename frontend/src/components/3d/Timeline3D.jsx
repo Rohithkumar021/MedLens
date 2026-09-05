@@ -21,18 +21,16 @@ export default function Timeline3D({ timeline = [], patient }) {
   // Calculate 3D coordinates along a chronological path
   const eventNodes = useMemo(() => {
     return timeline.map((ev, i) => {
-      const t = i / Math.max(1, timeline.length - 1);
-      // Helical curve through 3D space: x spreads horizontally, y ripples, z oscillates
       const x = (i - (timeline.length - 1) / 2) * 110;
       const y = Math.sin(i * 0.8) * 35;
       const z = Math.cos(i * 0.8) * 55;
 
-      let color = '#38bdf8';
+      let color = '#0284c7';
       if (ev.event_type === 'PROFILE_CREATED') color = '#0284c7';
-      else if (ev.event_type === 'REPORT_UPLOADED') color = '#6366f1';
-      else if (ev.event_type === 'REVIEW_UPDATED') color = '#10b981';
-      else if (ev.event_type === 'AI_SUMMARY_GENERATED') color = '#a855f7';
-      else if (ev.event_type === 'CONFLICT_DETECTED') color = '#f43f5e';
+      else if (ev.event_type === 'REPORT_UPLOADED') color = '#475569';
+      else if (ev.event_type === 'REVIEW_UPDATED') color = '#16a34a';
+      else if (ev.event_type === 'AI_SUMMARY_GENERATED') color = '#7c3aed';
+      else if (ev.event_type === 'CONFLICT_DETECTED') color = '#dc2626';
 
       return {
         ...ev,
@@ -95,8 +93,11 @@ export default function Timeline3D({ timeline = [], patient }) {
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Deep spatial slate
-      ctx.fillStyle = '#090d16';
+      // Clean Light Clinical Canvas
+      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 50, width / 2, height / 2, width * 0.7);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(1, '#f1f5f9');
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
       const cam = cameraRef.current;
@@ -122,7 +123,7 @@ export default function Timeline3D({ timeline = [], patient }) {
         for (let i = 1; i < projected.length; i++) {
           ctx.lineTo(projected[i].screenX, projected[i].screenY);
         }
-        ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+        ctx.strokeStyle = 'rgba(2, 132, 199, 0.35)';
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
@@ -136,9 +137,7 @@ export default function Timeline3D({ timeline = [], patient }) {
         if (p1 && p2) {
           const sx = p1.screenX + (p2.screenX - p1.screenX) * frac;
           const sy = p1.screenY + (p2.screenY - p1.screenY) * frac;
-          ctx.fillStyle = '#ffffff';
-          ctx.shadowColor = '#38bdf8';
-          ctx.shadowBlur = 10;
+          ctx.fillStyle = '#0284c7';
           ctx.beginPath();
           ctx.arc(sx, sy, 4, 0, Math.PI * 2);
           ctx.fill();
@@ -161,8 +160,8 @@ export default function Timeline3D({ timeline = [], patient }) {
         // Glow
         if (isSelected || isHovered) {
           const glow = ctx.createRadialGradient(0, 0, r * 0.2, 0, 0, r * 2.2);
-          glow.addColorStop(0, node.color);
-          glow.addColorStop(1, 'rgba(0,0,0,0)');
+          glow.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+          glow.addColorStop(1, 'rgba(255,255,255,0)');
           ctx.fillStyle = glow;
           ctx.beginPath();
           ctx.arc(0, 0, r * 2.2, 0, Math.PI * 2);
@@ -173,28 +172,28 @@ export default function Timeline3D({ timeline = [], patient }) {
         const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
         grad.addColorStop(0, '#ffffff');
         grad.addColorStop(0.4, node.color);
-        grad.addColorStop(1, '#020617');
+        grad.addColorStop(1, '#0f172a');
 
         ctx.fillStyle = grad;
         ctx.beginPath();
         ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = isSelected ? '#ffffff' : 'rgba(255, 255, 255, 0.4)';
+        ctx.strokeStyle = isSelected ? '#0284c7' : 'rgba(255, 255, 255, 0.9)';
         ctx.lineWidth = isSelected ? 2.5 : 1.2;
         ctx.stroke();
 
         // Date pill above node
-        ctx.font = 'bold 9.5px Inter, system-ui, sans-serif';
+        ctx.font = 'bold 9.5px "Plus Jakarta Sans", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillStyle = '#94a3b8';
+        ctx.fillStyle = '#64748b';
         ctx.fillText(node.event_date || 'Date N/A', 0, -r - 10);
 
         // Title below node
         if (node.scale > 0.5 || isSelected || isHovered) {
-          ctx.fillStyle = isSelected ? '#38bdf8' : '#ffffff';
-          ctx.font = '600 10.5px Inter, system-ui, sans-serif';
+          ctx.fillStyle = isSelected ? '#0284c7' : '#0f172a';
+          ctx.font = '600 10.5px "Plus Jakarta Sans", system-ui, sans-serif';
           const titleText = node.title.length > 20 ? node.title.slice(0, 20) + '...' : node.title;
           ctx.fillText(titleText, 0, r + 14);
         }
@@ -235,7 +234,6 @@ export default function Timeline3D({ timeline = [], patient }) {
       return;
     }
 
-    // Hit-test
     let closest = null;
     let minDist = Infinity;
     eventNodes.forEach((ev) => {
@@ -263,7 +261,7 @@ export default function Timeline3D({ timeline = [], patient }) {
   return (
     <div className="space-y-4">
       {/* 3D Timeline Canvas */}
-      <div className="relative h-64 sm:h-72 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-elevation">
+      <div className="relative h-64 sm:h-72 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-card">
         <canvas
           ref={canvasRef}
           onMouseDown={handleMouseDown}
@@ -273,8 +271,8 @@ export default function Timeline3D({ timeline = [], patient }) {
         />
 
         {/* Status indicator */}
-        <div className="absolute top-3 left-4 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-xl border border-slate-800 text-xs font-bold text-sky-400">
-          <Clock className="w-3.5 h-3.5" /> 3D Spatial Timeline
+        <div className="absolute top-3 left-4 flex items-center gap-2 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-200 text-xs font-bold text-brand-700 shadow-subtle">
+          <Clock className="w-3.5 h-3.5 text-brand-600" /> Clinical Chronology Map
         </div>
 
         <button
@@ -286,7 +284,7 @@ export default function Timeline3D({ timeline = [], patient }) {
             cam.panX = 0;
             cam.panY = 0;
           }}
-          className="absolute top-3 right-4 p-1.5 bg-slate-900/80 text-slate-400 hover:text-white rounded-lg border border-slate-800 transition"
+          className="absolute top-3 right-4 p-1.5 bg-white/95 text-slate-600 hover:text-slate-900 rounded-lg border border-slate-200 transition shadow-subtle"
           title="Reset Camera"
         >
           <RotateCcw className="w-4 h-4" />
@@ -295,28 +293,28 @@ export default function Timeline3D({ timeline = [], patient }) {
 
       {/* Selected Event Card Detail */}
       {selectedEvent && (
-        <div className="p-5 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-elevation animate-fade-in space-y-3">
+        <div className="p-5 bg-white text-slate-900 rounded-2xl border border-slate-200 shadow-card animate-modal-in space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span
                 className="w-3 h-3 rounded-full shrink-0"
-                style={{ backgroundColor: selectedEvent.color || '#38bdf8' }}
+                style={{ backgroundColor: selectedEvent.color || '#0284c7' }}
               />
-              <span className="text-xs font-bold uppercase tracking-wider text-sky-400">
+              <span className="text-xs font-bold uppercase tracking-wider text-brand-700">
                 {selectedEvent.event_type}
               </span>
             </div>
-            <span className="font-mono text-xs text-slate-400">
+            <span className="font-mono text-xs text-slate-500">
               {selectedEvent.event_date || 'Date N/A'}
             </span>
           </div>
 
-          <h3 className="text-base font-extrabold text-white">{selectedEvent.title}</h3>
-          <p className="text-xs text-slate-300 leading-relaxed">{selectedEvent.description}</p>
+          <h3 className="text-base font-extrabold text-slate-900">{selectedEvent.title}</h3>
+          <p className="text-xs text-slate-600 leading-relaxed">{selectedEvent.description}</p>
 
-          <div className="pt-2 border-t border-slate-800 flex items-center justify-between">
+          <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
             <ProvenanceBadge provenance={selectedEvent.provenance || 'REPORT_EXTRACTED'} size="sm" />
-            <span className="text-[11px] text-slate-500 font-mono">
+            <span className="text-[11px] text-slate-400 font-mono">
               Event #{selectedEvent.index !== undefined ? selectedEvent.index + 1 : 1} of {timeline.length}
             </span>
           </div>
@@ -325,4 +323,3 @@ export default function Timeline3D({ timeline = [], patient }) {
     </div>
   );
 }
-

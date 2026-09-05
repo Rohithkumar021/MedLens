@@ -15,16 +15,16 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '1. Clinical Observation & Reported Value',
       tag: 'Observation',
       icon: Activity,
-      color: '#38bdf8',
+      color: '#0284c7',
       desc: 'Standardized observation extracted from source record with clinical measurement and unit.',
       content: (
         <div className="space-y-1">
-          <div className="text-white font-extrabold text-sm">{observation.test_name}</div>
-          <div className="font-mono text-base font-bold text-sky-400">
-            {observation.corrected_value || observation.value_text} <span className="text-xs text-slate-400">{observation.unit || ''}</span>
+          <div className="text-slate-900 font-extrabold text-sm">{observation.test_name}</div>
+          <div className="font-mono text-base font-bold text-brand-600">
+            {observation.corrected_value || observation.value_text} <span className="text-xs text-slate-500">{observation.unit || ''}</span>
           </div>
           {observation.corrected_value && (
-            <div className="text-[10.5px] text-amber-300 italic">
+            <div className="text-[10.5px] text-amber-700 italic">
               Original raw value: {observation.value_text} (Clinician corrected)
             </div>
           )}
@@ -36,12 +36,12 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '2. Source Document & Report Metadata',
       tag: 'Document',
       icon: FileText,
-      color: '#0284c7',
+      color: '#475569',
       desc: 'Originating report document, diagnostic laboratory, and collection date.',
       content: (
-        <div className="space-y-1 text-xs text-slate-300">
-          <div className="text-white font-bold">{report?.title || 'Laboratory Report'}</div>
-          <div className="font-mono text-[11px] text-slate-400">File: {report?.original_file_name || 'Apex_Lab_Report.pdf'}</div>
+        <div className="space-y-1 text-xs text-slate-700">
+          <div className="text-slate-900 font-bold">{report?.title || 'Laboratory Report'}</div>
+          <div className="font-mono text-[11px] text-slate-500">File: {report?.original_file_name || 'Apex_Lab_Report.pdf'}</div>
           <div>Lab: {report?.laboratory_name || 'Apex Health Diagnostics'}</div>
           <div>Collection Date: {observation.observation_date || report?.report_date || '2026-08-15'}</div>
         </div>
@@ -56,10 +56,10 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       desc: 'Specific page number and verbatim digital extraction text from source document.',
       content: (
         <div className="space-y-1.5">
-          <div className="text-xs font-mono text-sky-300 bg-slate-800 px-2 py-0.5 rounded w-fit">
+          <div className="text-xs font-mono text-brand-700 bg-sky-50 border border-sky-200 px-2 py-0.5 rounded w-fit">
             Source Page: {observation.source_page || 1}
           </div>
-          <div className="p-2 bg-slate-950 text-slate-200 font-mono text-xs rounded-lg border border-slate-800 select-text">
+          <div className="p-2.5 bg-slate-50 text-slate-800 font-mono text-xs rounded-lg border border-slate-200 select-text">
             {observation.original_text || `${observation.test_name} | ${observation.value_text} | ${observation.unit || ''} | ${observation.original_reference_range || ''}`}
           </div>
         </div>
@@ -70,15 +70,15 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '4. Reference Range Supplied by Source',
       tag: 'Interval',
       icon: Shield,
-      color: '#06b6d4',
+      color: '#0891b2',
       desc: 'Strict reference interval stated by source document. No invented standard ranges.',
       content: (
         <div className="space-y-1">
-          <div className="font-mono text-xs font-bold text-white bg-slate-800/80 p-2 rounded-lg border border-slate-700">
+          <div className="font-mono text-xs font-bold text-slate-900 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
             {observation.original_reference_range ? (
-              <span className="text-sky-300">{observation.original_reference_range} {observation.unit || ''}</span>
+              <span className="text-brand-700">{observation.original_reference_range} {observation.unit || ''}</span>
             ) : (
-              <span className="text-slate-400 italic">Reference range not provided in source report (Evaluates to NOT_AVAILABLE)</span>
+              <span className="text-slate-500 italic">Reference range not provided in source report (Evaluates to NOT_AVAILABLE)</span>
             )}
           </div>
         </div>
@@ -89,16 +89,16 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '5. Deterministic Evaluation & Reasoning',
       tag: 'Logic',
       icon: Cpu,
-      color: '#10b981',
+      color: '#16a34a',
       desc: 'Mathematical evaluation of observation status with step-by-step logic.',
       content: (
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Computed Status:</span>
+            <span className="text-xs text-slate-500">Computed Status:</span>
             <StatusBadge status={observation.corrected_status || observation.status} size="sm" />
           </div>
-          <div className="p-2 bg-slate-800/80 rounded-lg text-xs text-slate-300 leading-relaxed border border-slate-700">
-            <span className="font-bold text-white">Reasoning: </span>
+          <div className="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 leading-relaxed border border-slate-200">
+            <span className="font-bold text-slate-900">Reasoning: </span>
             {observation.status_reason}
           </div>
         </div>
@@ -109,14 +109,14 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '6. Information Provenance',
       tag: 'Provenance',
       icon: Sparkles,
-      color: '#8b5cf6',
+      color: '#7c3aed',
       desc: 'Auditable lineage classification establishing where this clinical information originated.',
       content: (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ProvenanceBadge provenance={observation.provenance} size="sm" />
           </div>
-          <p className="text-xs text-slate-300">
+          <p className="text-xs text-slate-600">
             {observation.provenance === 'REPORT_EXTRACTED' && 'Direct digital extraction from submitted clinical report document.'}
             {observation.provenance === 'USER_PROVIDED' && 'Direct clinical entry provided during patient intake.'}
             {observation.provenance === 'SYSTEM_DERIVED' && 'Deterministically computed by MedLens clinical logic rules.'}
@@ -130,14 +130,14 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '7. Extraction Confidence',
       tag: 'Fidelity',
       icon: Shield,
-      color: '#ec4899',
+      color: '#db2777',
       desc: 'Algorithmic digital parsing certainty metric. Never represents medical certainty.',
       content: (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ConfidenceBadge confidence={observation.confidence} size="sm" />
           </div>
-          <p className="text-xs text-slate-300">
+          <p className="text-xs text-slate-600">
             {observation.confidence >= 0.95
               ? 'High-certainty digital PDF text match with tabular structure alignment.'
               : observation.confidence >= 0.8
@@ -152,21 +152,21 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       title: '8. Human Review & Audit State',
       tag: 'Audit',
       icon: UserCheck,
-      color: '#f59e0b',
+      color: '#d97706',
       desc: 'Clinician verification status, reviewer justification, and immutable historical audit trail.',
       content: (
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400">Review State:</span>
-            <span className={`text-[10.5px] uppercase font-bold px-2 py-0.5 rounded ${
-              observation.is_reviewed ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+            <span className="text-xs text-slate-500">Review State:</span>
+            <span className={`text-[10.5px] uppercase font-bold px-2 py-0.5 rounded border ${
+              observation.is_reviewed ? 'bg-emerald-50 text-emerald-800 border-emerald-200' : 'bg-amber-50 text-amber-800 border-amber-200'
             }`}>
               {observation.review_status || 'UNREVIEWED'}
             </span>
           </div>
           {observation.reviewer_notes && (
-            <div className="p-2 bg-slate-800 rounded-lg text-xs text-slate-300 border border-slate-700">
-              <span className="font-bold text-white">Reviewer Note: </span> {observation.reviewer_notes}
+            <div className="p-2.5 bg-slate-50 rounded-lg text-xs text-slate-700 border border-slate-200">
+              <span className="font-bold text-slate-900">Reviewer Note: </span> {observation.reviewer_notes}
             </div>
           )}
         </div>
@@ -199,8 +199,11 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Deep dark background
-      ctx.fillStyle = '#090d16';
+      // Clean Light Clinical Canvas
+      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 40, width / 2, height / 2, width * 0.7);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(1, '#f1f5f9');
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
       // Node spatial positions (serpentine 3D path)
@@ -221,7 +224,7 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
         ctx.quadraticCurveTo(stageCoords[i].x, stageCoords[i].y, xc, yc);
       }
       ctx.lineTo(stageCoords[stageCoords.length - 1].x, stageCoords[stageCoords.length - 1].y);
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
+      ctx.strokeStyle = 'rgba(2, 132, 199, 0.25)';
       ctx.lineWidth = 3;
       ctx.stroke();
 
@@ -235,9 +238,7 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
       if (p1 && p2) {
         const pulseX = p1.x + (p2.x - p1.x) * subT;
         const pulseY = p1.y + (p2.y - p1.y) * subT;
-        ctx.fillStyle = '#38bdf8';
-        ctx.shadowColor = '#38bdf8';
-        ctx.shadowBlur = 12;
+        ctx.fillStyle = '#0284c7';
         ctx.beginPath();
         ctx.arc(pulseX, pulseY, 5, 0, Math.PI * 2);
         ctx.fill();
@@ -253,8 +254,8 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
         // Glow
         if (isActive || isHovered) {
           const glow = ctx.createRadialGradient(x, y, radius * 0.2, x, y, radius * 2.2);
-          glow.addColorStop(0, stage.color);
-          glow.addColorStop(1, 'rgba(0,0,0,0)');
+          glow.addColorStop(0, 'rgba(2, 132, 199, 0.25)');
+          glow.addColorStop(1, 'rgba(255,255,255,0)');
           ctx.fillStyle = glow;
           ctx.beginPath();
           ctx.arc(x, y, radius * 2.2, 0, Math.PI * 2);
@@ -262,25 +263,25 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
         }
 
         // Node Circle
-        ctx.fillStyle = isActive ? '#ffffff' : stage.color;
+        ctx.fillStyle = isActive ? '#0284c7' : stage.color;
         ctx.beginPath();
         ctx.arc(x, y, radius, 0, Math.PI * 2);
         ctx.fill();
 
-        ctx.strokeStyle = '#0f172a';
+        ctx.strokeStyle = '#ffffff';
         ctx.lineWidth = 2.5;
         ctx.stroke();
 
         // Stage Number
-        ctx.fillStyle = isActive ? '#0f172a' : '#ffffff';
-        ctx.font = 'bold 10px Inter, system-ui, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 10px "Plus Jakarta Sans", system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(stage.id.toString(), x, y);
 
         // Tag label below
-        ctx.fillStyle = isActive ? '#38bdf8' : '#94a3b8';
-        ctx.font = 'bold 9.5px Inter, system-ui, sans-serif';
+        ctx.fillStyle = isActive ? '#0284c7' : '#64748b';
+        ctx.font = 'bold 9.5px "Plus Jakarta Sans", system-ui, sans-serif';
         ctx.fillText(stage.tag, x, y + radius + 12);
       });
 
@@ -309,7 +310,7 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
   return (
     <div className="space-y-4">
       {/* 3D Spatial Path Canvas */}
-      <div className="relative h-44 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-inner">
+      <div className="relative h-44 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-card">
         <canvas
           ref={canvasRef}
           onClick={handleCanvasClick}
@@ -318,29 +319,29 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
         />
 
         {/* Floating Quick Stepper */}
-        <div className="absolute top-3 left-4 right-4 flex items-center justify-between text-[11px] font-bold text-slate-400 pointer-events-none">
-          <span className="bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-800 text-sky-400">
+        <div className="absolute top-3 left-4 right-4 flex items-center justify-between text-[11px] font-bold text-slate-500 pointer-events-none">
+          <span className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-200 text-brand-700 shadow-subtle">
             STAGE {activeStage} OF 8: {currentStageObj.tag.toUpperCase()}
           </span>
-          <span className="bg-slate-900/90 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-800">
+          <span className="bg-white/95 backdrop-blur-md px-2.5 py-1 rounded-lg border border-slate-200 shadow-subtle">
             Click stage points to scrub path
           </span>
         </div>
       </div>
 
       {/* Active Stage Deep Inspection Card */}
-      <div className="p-5 bg-slate-900 text-white rounded-2xl border border-slate-800 shadow-elevation space-y-4 animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+      <div className="p-5 bg-white text-slate-900 rounded-2xl border border-slate-200 shadow-card space-y-4 animate-modal-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
           <div className="flex items-center gap-3">
             <div
-              className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-white text-sm shrink-0"
+              className="w-8 h-8 rounded-xl flex items-center justify-center font-bold text-white text-sm shrink-0 shadow-subtle"
               style={{ backgroundColor: currentStageObj.color }}
             >
               {currentStageObj.id}
             </div>
             <div>
-              <h4 className="text-sm font-extrabold text-white">{currentStageObj.title}</h4>
-              <p className="text-xs text-slate-400">{currentStageObj.desc}</p>
+              <h4 className="text-sm font-extrabold text-slate-900">{currentStageObj.title}</h4>
+              <p className="text-xs text-slate-500">{currentStageObj.desc}</p>
             </div>
           </div>
 
@@ -349,18 +350,18 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
             <button
               onClick={() => setActiveStage((p) => Math.max(1, p - 1))}
               disabled={activeStage === 1}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 transition"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 transition"
               aria-label="Previous Stage"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            <span className="font-mono text-xs font-bold text-slate-400 px-2">
+            <span className="font-mono text-xs font-bold text-slate-600 px-2">
               {activeStage} / 8
             </span>
             <button
               onClick={() => setActiveStage((p) => Math.min(8, p + 1))}
               disabled={activeStage === 8}
-              className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 disabled:opacity-40 text-slate-200 transition"
+              className="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 transition"
               aria-label="Next Stage"
             >
               <ChevronRight className="w-4 h-4" />
@@ -369,11 +370,10 @@ export default function EvidenceChain3D({ observation, report, onOpenReview }) {
         </div>
 
         {/* Real Content Payload */}
-        <div className="p-4 bg-slate-950/70 rounded-xl border border-slate-800">
+        <div className="p-4 bg-slate-50 rounded-xl border border-slate-200">
           {currentStageObj.content}
         </div>
       </div>
     </div>
   );
 }
-

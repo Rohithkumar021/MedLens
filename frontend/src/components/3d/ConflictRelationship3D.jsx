@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useMemo } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { AlertTriangle, ShieldCheck, User, Pill, Activity, Link2, CheckCircle2, ChevronRight } from 'lucide-react';
 
 export default function ConflictRelationship3D({ conflicts = [], patient, onResolveConflict }) {
@@ -29,8 +29,11 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.save();
       ctx.scale(dpr, dpr);
 
-      // Deep dark clinical slate
-      ctx.fillStyle = '#090d16';
+      // Clean Light Clinical Canvas
+      const bgGrad = ctx.createRadialGradient(width / 2, height / 2, 40, width / 2, height / 2, width * 0.7);
+      bgGrad.addColorStop(0, '#ffffff');
+      bgGrad.addColorStop(1, '#f1f5f9');
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, width, height);
 
       const centerX = width / 2;
@@ -47,7 +50,7 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.setLineDash([6, 6]);
       ctx.moveTo(leftX, nodeY);
       ctx.lineTo(rightX, nodeY);
-      ctx.strokeStyle = '#f43f5e';
+      ctx.strokeStyle = '#dc2626';
       ctx.lineWidth = 2.5;
       ctx.stroke();
 
@@ -55,15 +58,15 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       const waveOffset = (Math.sin(t * 3) * 12);
       ctx.beginPath();
       ctx.arc(centerX, centerY + waveOffset, 18, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(244, 63, 94, 0.2)';
+      ctx.fillStyle = 'rgba(220, 38, 38, 0.1)';
       ctx.fill();
-      ctx.strokeStyle = '#f43f5e';
+      ctx.strokeStyle = '#dc2626';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Warning text in center
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 11px "Plus Jakarta Sans", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText('CONFLICT', centerX, centerY + waveOffset);
@@ -74,17 +77,17 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.beginPath();
       ctx.arc(leftX, nodeY, 26, 0, Math.PI * 2);
       const g1 = ctx.createRadialGradient(leftX, nodeY, 5, leftX, nodeY, 26);
-      g1.addColorStop(0, '#fda4af');
-      g1.addColorStop(0.5, '#f43f5e');
-      g1.addColorStop(1, '#881337');
+      g1.addColorStop(0, '#fee2e2');
+      g1.addColorStop(0.5, '#ef4444');
+      g1.addColorStop(1, '#991b1b');
       ctx.fillStyle = g1;
       ctx.fill();
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 11px "Plus Jakarta Sans", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Allergy: Penicillin', leftX, nodeY + 42);
       ctx.restore();
@@ -94,7 +97,7 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.beginPath();
       ctx.arc(rightX, nodeY, 26, 0, Math.PI * 2);
       const g2 = ctx.createRadialGradient(rightX, nodeY, 5, rightX, nodeY, 26);
-      g2.addColorStop(0, '#c084fc');
+      g2.addColorStop(0, '#f3e8ff');
       g2.addColorStop(0.5, '#a855f7');
       g2.addColorStop(1, '#581c87');
       ctx.fillStyle = g2;
@@ -103,8 +106,8 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 11px "Plus Jakarta Sans", system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText('Rx: Amoxicillin', rightX, nodeY + 42);
       ctx.restore();
@@ -119,13 +122,12 @@ export default function ConflictRelationship3D({ conflicts = [], patient, onReso
 
   return (
     <div className="space-y-4">
-      <div className="relative h-48 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-elevation">
+      <div className="relative h-48 bg-white rounded-2xl overflow-hidden border border-slate-200 shadow-card">
         <canvas ref={canvasRef} className="w-full h-full block" />
-        <div className="absolute top-3 left-4 flex items-center gap-2 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-xl border border-slate-800 text-xs font-bold text-rose-400">
-          <AlertTriangle className="w-3.5 h-3.5" /> 3D Inconsistency Topology
+        <div className="absolute top-3 left-4 flex items-center gap-2 bg-white/95 backdrop-blur-md px-3 py-1 rounded-lg border border-slate-200 text-xs font-bold text-rose-700 shadow-subtle">
+          <AlertTriangle className="w-3.5 h-3.5 text-rose-600" /> Inconsistency Topology
         </div>
       </div>
     </div>
   );
 }
-
