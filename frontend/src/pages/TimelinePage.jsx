@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Clock, Calendar, FileText, UserCheck, Sparkles, CheckCircle, Filter, Layers } from 'lucide-react';
 import ProvenanceBadge from '../components/ProvenanceBadge';
 import Timeline3D from '../components/3d/Timeline3D';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../components/ui/card';
+import { Card } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 

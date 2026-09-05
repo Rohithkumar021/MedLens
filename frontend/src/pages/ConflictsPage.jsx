@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { AlertTriangle, CheckCircle, ShieldAlert, Check, X, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, ShieldCheck } from 'lucide-react';
 import ProvenanceBadge from '../components/ProvenanceBadge';
 import ConflictRelationship3D from '../components/3d/ConflictRelationship3D';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Badge } from '../components/ui/badge';
 

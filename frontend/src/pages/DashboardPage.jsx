@@ -9,8 +9,6 @@ import {
   HelpCircle,
   Activity,
   Link2,
-  CheckCircle2,
-  Check,
   Edit3,
   Users,
   Clock,

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { Settings, Shield, Server, Cpu, CheckCircle2, AlertCircle, FileCheck, Check } from 'lucide-react';
+import { Settings, Shield, Server, Cpu, CheckCircle2, AlertCircle } from 'lucide-react';
 import { api } from '../services/api';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../components/ui/card';
-import { Badge } from '../components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/card';
 import { Alert, AlertTitle, AlertDescription } from '../components/ui/alert';
 
 export default function SettingsPage() {

@@ -9,7 +9,6 @@ import {
   ShieldAlert,
   LayoutGrid,
   List,
-  CheckCircle2,
   ChevronRight
 } from 'lucide-react';
 import ProvenanceBadge from '../components/ProvenanceBadge';
